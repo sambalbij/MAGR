@@ -377,11 +377,16 @@
     <ClCompile Include="CopyContext.cpp">
       <Filter>windows</Filter>
     </ClCompile>
+<<<<<<< HEAD
     <ClCompile Include="..\experiments\MeshImporterExperiment.cpp">
       <Filter>experiments</Filter>
     </ClCompile>
     <ClCompile Include="MyMeshExperiment.cpp">
       <Filter>experiments</Filter>
+=======
+    <ClCompile Include="TriangleRayIntersection.cpp">
+      <Filter>windows</Filter>
+>>>>>>> 762b121d11326c028d39b00577987d407eb4e7cd
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -690,6 +695,11 @@
     <ClInclude Include="MyMeshExperiment.h">
       <Filter>experiments</Filter>
     </ClInclude>
+<<<<<<< HEAD
+=======
+    <ClInclude Include="CopyContext.h" />
+    <ClInclude Include="TriangleRayIntersection.h" />
+>>>>>>> 762b121d11326c028d39b00577987d407eb4e7cd
   </ItemGroup>
   <ItemGroup>
     <None Include="..\images\ArrowDropDownSmall.png">

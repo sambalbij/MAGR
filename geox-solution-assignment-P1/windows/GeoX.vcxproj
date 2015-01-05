@@ -113,6 +113,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TriangleRayIntersection.cpp" />
     <ClCompile Include="winmain.cpp" />
     <ClCompile Include="..\geoX\GeoXMainWindow.cpp" />
     <ClCompile Include="..\math\BoundingBox.cpp" />
@@ -226,6 +227,7 @@
     <ClInclude Include="..\geometry\TriangleMesh.h" />
     <ClInclude Include="..\geometry\StructureDescriptor.h" />
     <ClInclude Include="..\geometry\StructureDescriptor.hpp" />
+    <ClInclude Include="TriangleRayIntersection.h" />
     <CustomBuild Include="..\viewers\widgets\BasicGLViewer3D.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc "%(RootDir)%(Directory)%(Filename).h" -o "%(RootDir)%(Directory)moc/%(Filename)_moc.cpp"</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">moc: compiling %(Filename).h</Message>
