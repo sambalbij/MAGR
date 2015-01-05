@@ -364,9 +364,6 @@
     <ClCompile Include="..\geometry\AttributeAccessToken.cpp">
       <Filter>geometry</Filter>
     </ClCompile>
-    <ClCompile Include="..\experiments\MeshImporterExperiment.cpp">
-      <Filter>experiments</Filter>
-    </ClCompile>
     <ClCompile Include="..\InitGeoX.cpp" />
     <ClCompile Include="..\viewers\widgets\BasicGeoXGLWidget3D.cpp">
       <Filter>viewers\widgets</Filter>
@@ -379,6 +376,12 @@
     </ClCompile>
     <ClCompile Include="CopyContext.cpp">
       <Filter>windows</Filter>
+    </ClCompile>
+    <ClCompile Include="..\experiments\MeshImporterExperiment.cpp">
+      <Filter>experiments</Filter>
+    </ClCompile>
+    <ClCompile Include="MyMeshExperiment.cpp">
+      <Filter>experiments</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -677,13 +680,16 @@
     <ClInclude Include="..\geometry\StructureAttribDescriptor.hpp">
       <Filter>geometry</Filter>
     </ClInclude>
-    <ClInclude Include="..\experiments\MeshImporterExperiment.h">
-      <Filter>experiments</Filter>
-    </ClInclude>
     <ClInclude Include="..\experiments\SimpleGLMeshMaterial.h">
       <Filter>experiments</Filter>
     </ClInclude>
     <ClInclude Include="CopyContext.h" />
+    <ClInclude Include="..\experiments\MeshImporterExperiment.h">
+      <Filter>experiments</Filter>
+    </ClInclude>
+    <ClInclude Include="MyMeshExperiment.h">
+      <Filter>experiments</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\images\ArrowDropDownSmall.png">

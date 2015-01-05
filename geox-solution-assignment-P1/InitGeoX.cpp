@@ -28,6 +28,7 @@
 #include "ExampleExperiment3DGraphics.h"
 #include "ExampleExperimentMarchingCubes.h"
 #include "MeshImporterExperiment.h"
+#include "MyMeshExperiment.h"
 #include "SimpleGLMeshMaterial.h"
 
 #include "StructureDescriptor.h"
@@ -65,6 +66,7 @@ void init() {
 	ExampleExperiment3DGraphics::init(Experiment::getClass());
 	ExampleExperimentMarchingCubes::init(Experiment::getClass());
 	MeshImporterExperiment::init(Experiment::getClass());
+	MyMeshExperiment::init(Experiment::getClass());
 	SimpleGLMeshMaterial::init(Persistent::getClass());
 
    StructureDescriptor::init(Persistent::getClass());
@@ -98,6 +100,7 @@ void shutdown() {
 	ExampleExperiment3DGraphics::shutdown();
 	ExampleExperimentMarchingCubes::shutdown();
 	MeshImporterExperiment::shutdown();
+	MyMeshExperiment::shutdown();
 	SimpleGLMeshMaterial::shutdown();
 
 	StructureDescriptor::shutdown();
