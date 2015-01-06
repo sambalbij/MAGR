@@ -81,6 +81,7 @@ void MyMeshExperiment::getViewerInfo() {
 		<< "\n";     
 	getRays();
 	shootRays();
+	saveImage();
 }
 
 void MyMeshExperiment::getRays()
@@ -167,7 +168,22 @@ void MyMeshExperiment::shootRays()
 			colours[x][y] = bestColour;
 		}//rays
 	}
+	delete tri;
 }
+
+void MyMeshExperiment::saveImage()
+{
+	QImage image(101, 101, QImage::Format_RGB32);
+	for (int x = 0; x <= 100; x++)
+	{
+		for (int y = 0; y <= 100; y++)
+		{
+			image.setPixel(x, y, qRgb(int(colours[x][y][0] * 255), int(colours[x][y][1] * 255), int(colours[x][y][2] * 255)));
+		}
+	}
+	image.save(QString("test.png"));
+}
+
 /*
 MyTriangle t;
 t.pos[0] = pos[0];

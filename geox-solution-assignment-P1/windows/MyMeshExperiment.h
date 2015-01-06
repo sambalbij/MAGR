@@ -35,7 +35,7 @@ public:
 	void getViewerInfo();
 	void getRays();
 	void shootRays();
-
+	void saveImage();
 
 	~MyMeshExperiment();
 };
