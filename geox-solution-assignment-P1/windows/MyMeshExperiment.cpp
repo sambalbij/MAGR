@@ -156,11 +156,26 @@ void MyMeshExperiment::shootRays()
 				if (xt)
 					if (distance < minDistance)
 				{
-					minDistanceId = i; Vector3f colour[3];
+
+					bool shadow = checkShadow(ray, distance);
+					
+					minDistanceId = i; 
+					Vector3f colour[3];
 					colour[0] = pts->get<float32, 3>(tind[0], COL);
 					colour[1] = pts->get<float32, 3>(tind[1], COL);
 					colour[2] = pts->get<float32, 3>(tind[2], COL);
-					bestColour = colour[0] / 3 + colour[1] / 3 + colour[2] / 3;
+					if (!shadow)
+						bestColour = colour[0] / 3 + colour[1] / 3 + colour[2] / 3;
+					else
+					{
+						//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
+						//bestColour[1] = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
+						//bestColour[2] = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
+
+						bestColour[0] = 0;
+						bestColour[1] = 0;
+						bestColour[2] = 0;
+					}
 				}
 			}
 			if (minDistanceId == -1)
@@ -173,6 +188,39 @@ void MyMeshExperiment::shootRays()
 		}//rays
 	}
 	delete tri;
+}
+
+bool MyMeshExperiment::checkShadow(tuple<Vector3f, Vector3f> ray, float distance)
+{
+	Vector3f hit = (std::get<0>(ray) +std::get<1>(ray).operator*(distance));
+	Vector3f light = makeVector3f(0, 0, 10) - hit;
+	float newDistance;
+	TriangleRayIntersection* tri = new TriangleRayIntersection();
+
+	DynamicArrayOfStructures *idx = mesh->getTriangles();
+	if (!idx->providesAttribute("index"));
+	AAT IDX = idx->getAAT("index");
+
+	if (mesh == NULL);
+	DynamicArrayOfStructures *pts = mesh->getVertices();
+	if (!pts->providesAttribute("position"));
+	AAT POS = pts->getAAT("position");
+
+	// loop over triangle
+	const card32 numTri = idx->getNumEntries();
+	for (card32 i = 0; i < numTri; i++) 
+	{
+		Vector3i tind = idx->get<int32, 3>(i, IDX);
+		Vector3f pos[3];
+		pos[0] = pts->get<float32, 3>(tind[0], POS);
+		pos[1] = pts->get<float32, 3>(tind[1], POS);
+		pos[2] = pts->get<float32, 3>(tind[2], POS);
+
+		bool intersect = tri->getIntersection(hit, light, pos, newDistance);
+		if (!intersect||newDistance > 1)
+			return false;	//There is no shadow.
+	}
+	return true;
 }
 
 void MyMeshExperiment::saveImage()

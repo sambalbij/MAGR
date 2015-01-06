@@ -36,6 +36,7 @@ public:
 	void getViewerInfo();
 	void getRays();
 	void shootRays();
+	bool checkShadow(tuple<Vector3f, Vector3f>, float);
 	void saveImage();
 
 	~MyMeshExperiment();
