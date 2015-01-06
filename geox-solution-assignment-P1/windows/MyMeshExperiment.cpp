@@ -156,7 +156,7 @@ void MyMeshExperiment::shootRays()
 				if (xt)
 					if (distance < minDistance)
 				{
-
+					minDistance = distance;
 					bool shadow = checkShadow(ray, distance);
 					
 					minDistanceId = i; 
@@ -168,13 +168,13 @@ void MyMeshExperiment::shootRays()
 						bestColour = colour[0] / 3 + colour[1] / 3 + colour[2] / 3;
 					else
 					{
-						//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
+						bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
 						//bestColour[1] = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
 						//bestColour[2] = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
 
-						bestColour[0] = 0;
-						bestColour[1] = 0;
-						bestColour[2] = 0;
+						//bestColour[0] = 0;
+						//bestColour[1] = 0;
+						//bestColour[2] = 0;
 					}
 				}
 			}
@@ -192,7 +192,7 @@ void MyMeshExperiment::shootRays()
 
 bool MyMeshExperiment::checkShadow(tuple<Vector3f, Vector3f> ray, float distance)
 {
-	Vector3f hit = (std::get<0>(ray) +std::get<1>(ray).operator*(distance));
+	Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);
 	Vector3f light = makeVector3f(0, 0, 10) - hit;
 	float newDistance;
 	TriangleRayIntersection* tri = new TriangleRayIntersection();
@@ -216,11 +216,12 @@ bool MyMeshExperiment::checkShadow(tuple<Vector3f, Vector3f> ray, float distance
 		pos[1] = pts->get<float32, 3>(tind[1], POS);
 		pos[2] = pts->get<float32, 3>(tind[2], POS);
 
-		bool intersect = tri->getIntersection(hit, light, pos, newDistance);
-		if (!intersect||newDistance > 1)
-			return false;	//There is no shadow.
+		bool intersect = tri->getIntersection(hit+light*0.01, light, pos, newDistance);
+		if (intersect)
+			if (newDistance <= 1)// && newDistance > 0.01)
+				return true;		//There is shadow.
 	}
-	return true;
+	return false;
 }
 
 void MyMeshExperiment::saveImage()
