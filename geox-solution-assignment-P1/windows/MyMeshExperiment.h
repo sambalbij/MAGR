@@ -21,6 +21,7 @@ private:
 	BasicGLViewer3D* viewer;
 	TriangleMesh *mesh;
 	SimpleGLMeshMaterial *renderer;
+	ExaminerCameraController* controller;
 public:
 
 	MyMeshExperiment();
@@ -30,6 +31,7 @@ public:
 	virtual QWidget *createViewer();
 
 	void getViewerInfo();
+	void getRays();
 
 
 	~MyMeshExperiment();

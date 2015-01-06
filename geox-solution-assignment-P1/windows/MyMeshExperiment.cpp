@@ -68,7 +68,7 @@ void MyMeshExperiment::renderGL()
 }
 
 void MyMeshExperiment::getViewerInfo() {
-	ExaminerCameraController* controller = viewer->getController();
+	controller = viewer->getController();
 	//int *left, *top, *bottom, *right;
 	//viewer->getContentsMargins(left,top, right, bottom);
 	output //<< "vieweroutput:"
@@ -77,5 +77,30 @@ void MyMeshExperiment::getViewerInfo() {
 		<< "position: " << controller->getCamera()->getPosition()
 		<< " lookat: " << controller->getCamera()->getLookAt()
 		<< " distance: " << controller->getDistance()
-		<< "\n";                           
+		<< "\n";     
+	getRays();
+}
+
+void MyMeshExperiment::getRays()
+{	
+	tuple<Vector3f, Vector3f> rays [101][101];
+	controller = viewer->getController();
+	Vector3f lookat, position, right, up, view; 
+	lookat = controller->getCamera()->getLookAt();
+	position = controller->getCamera()->getPosition();
+	view = lookat - position;
+	up = controller->getCamera()->getUp();
+	right = up.crossProduct(view);
+	float distance = controller->getDistance();
+
+	for (int dx = -50; dx <= 50;dx++)
+		for (int dy = -50; dy <= 50; dy++)
+		{
+		Vector3f dr = right * distance * dx / 50;
+		Vector3f du = up * distance * dy / 50;
+		Vector3f pixelpos = lookat + dr + du;
+		rays[dx+50][dy+50] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
+
+		}
+	//tuple<Vector3f, Vector3f> ray = rays[50][50];
 }
