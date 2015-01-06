@@ -22,6 +22,10 @@ IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
 		ADD_OBJECT_PROP(renderer, 0, SimpleGLMeshMaterial::getClass(), true)
 		ADD_NOARGS_METHOD(MyMeshExperiment::importMesh)
 		ADD_NOARGS_METHOD(MyMeshExperiment::getViewerInfo)             // <--- get viewer info
+
+	ADD_SEPARATOR("Vectors & Matrices")          // 
+		ADD_VECTOR3F_PROP(incomingRay, 0)                // <---
+		ADD_MATRIX3F_PROP(triangleRefl, 0)                 // <---
 }
 
 QWidget *MyMeshExperiment::createViewer() {
@@ -35,6 +39,11 @@ MyMeshExperiment::MyMeshExperiment()
 	viewer = NULL;
 	mesh = NULL;
 	renderer = new SimpleGLMeshMaterial();
+
+	incomingRay = makeVector3f(1, -1, 0);
+	triangleRefl = makeMatrix3f(1, 2, 3,
+		4, 5, 6,
+		7, 8, 9);
 }
 
 MyMeshExperiment::~MyMeshExperiment()
@@ -79,9 +88,21 @@ void MyMeshExperiment::getViewerInfo() {
 		<< " lookat: " << controller->getCamera()->getLookAt()
 		<< " distance: " << controller->getDistance()
 		<< "\n";     
-	getRays();
+	
+	Vector3f tris[3];
+
+	tris[0] = triangleRefl * makeVector3f(1,0,0);
+	tris[1] = triangleRefl * makeVector3f(0, 1, 0);
+	tris[2] = triangleRefl * makeVector3f(0, 0, 1);
+
+	Vector3f outgoing;
+	getOutgoingReflaction(incomingRay, tris, outgoing);
+
+	output << "outgoing: " << outgoing;
+
+	/*getRays();
 	shootRays();
-	saveImage();
+	saveImage();*/
 }
 
 void MyMeshExperiment::getRays()
@@ -128,6 +149,12 @@ void MyMeshExperiment::shootRays()
 	if (!idx->providesAttribute("index")) return;
 	AAT IDX = idx->getAAT("index");
 
+	/*AAT NRM;
+	bool hasNormal = pts->providesAttribute("normal");
+	if (hasNormal) NRM = pts->getAAT("normal");
+*/
+	int32 reflectionDepth = 1;
+
 	//vector < MyTriangle > triangles;
 
 	// loop over rays
@@ -144,8 +171,8 @@ void MyMeshExperiment::shootRays()
 			// loop over triangle
 			const card32 numTri = idx->getNumEntries();
 			for (card32 i = 0; i < numTri; i++) {
-				Vector3i tind = idx->get<int32, 3>(i, IDX);			// triangle index of vertices (comes from triangle dynamic thing)
-				Vector3f pos[3];									// position of all vertices of the triangle
+				Vector3i tind = idx->get<int32, 3>(i, IDX);			// <-- triangle index of vertices (comes from triangle dynamic thing)
+				Vector3f pos[3];									// <-- position of all vertices of the triangle
 				pos[0] = pts->get<float32, 3>(tind[0], POS);
 				pos[1] = pts->get<float32, 3>(tind[1], POS);
 				pos[2] = pts->get<float32, 3>(tind[2], POS);
@@ -164,6 +191,11 @@ void MyMeshExperiment::shootRays()
 					colour[0] = pts->get<float32, 3>(tind[0], COL);
 					colour[1] = pts->get<float32, 3>(tind[1], COL);
 					colour[2] = pts->get<float32, 3>(tind[2], COL);
+
+
+					// REFLECTION CALCULATION
+					// Needed point, normal of point
+
 
 					if (!shadow)
 						bestColour = ( colour[0] + colour[1] + colour[2] ) / 3;
@@ -184,6 +216,14 @@ void MyMeshExperiment::shootRays()
 		}//rays
 	}
 	delete tri;
+}
+
+void MyMeshExperiment::getOutgoingReflaction(Vector3f rayDirection, Vector3f triangle[3], Vector3f &outgoingRay)
+{
+	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));	
+	t = t/norm(t);
+	outgoingRay = (rayDirection - (t * 2 ) * (rayDirection * t));
+	
 }
 
 bool MyMeshExperiment::checkShadow(tuple<Vector3f, Vector3f> ray, float distance)
