@@ -364,6 +364,9 @@
     <ClCompile Include="..\geometry\AttributeAccessToken.cpp">
       <Filter>geometry</Filter>
     </ClCompile>
+    <ClCompile Include="..\experiments\MeshImporterExperiment.cpp">
+      <Filter>experiments</Filter>
+    </ClCompile>
     <ClCompile Include="..\InitGeoX.cpp" />
     <ClCompile Include="..\viewers\widgets\BasicGeoXGLWidget3D.cpp">
       <Filter>viewers\widgets</Filter>
@@ -377,16 +380,11 @@
     <ClCompile Include="CopyContext.cpp">
       <Filter>windows</Filter>
     </ClCompile>
-<<<<<<< HEAD
-    <ClCompile Include="..\experiments\MeshImporterExperiment.cpp">
-      <Filter>experiments</Filter>
-    </ClCompile>
-    <ClCompile Include="MyMeshExperiment.cpp">
-      <Filter>experiments</Filter>
-=======
     <ClCompile Include="TriangleRayIntersection.cpp">
       <Filter>windows</Filter>
->>>>>>> 762b121d11326c028d39b00577987d407eb4e7cd
+    </ClCompile>
+    <ClCompile Include="MyMeshExperiment.cpp">
+      <Filter>windows</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -685,21 +683,19 @@
     <ClInclude Include="..\geometry\StructureAttribDescriptor.hpp">
       <Filter>geometry</Filter>
     </ClInclude>
+    <ClInclude Include="..\experiments\MeshImporterExperiment.h">
+      <Filter>experiments</Filter>
+    </ClInclude>
     <ClInclude Include="..\experiments\SimpleGLMeshMaterial.h">
       <Filter>experiments</Filter>
     </ClInclude>
     <ClInclude Include="CopyContext.h" />
-    <ClInclude Include="..\experiments\MeshImporterExperiment.h">
-      <Filter>experiments</Filter>
+    <ClInclude Include="TriangleRayIntersection.h">
+      <Filter>windows</Filter>
     </ClInclude>
     <ClInclude Include="MyMeshExperiment.h">
-      <Filter>experiments</Filter>
+      <Filter>windows</Filter>
     </ClInclude>
-<<<<<<< HEAD
-=======
-    <ClInclude Include="CopyContext.h" />
-    <ClInclude Include="TriangleRayIntersection.h" />
->>>>>>> 762b121d11326c028d39b00577987d407eb4e7cd
   </ItemGroup>
   <ItemGroup>
     <None Include="..\images\ArrowDropDownSmall.png">

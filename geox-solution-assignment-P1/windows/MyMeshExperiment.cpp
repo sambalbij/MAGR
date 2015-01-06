@@ -68,12 +68,14 @@ void MyMeshExperiment::renderGL()
 }
 
 void MyMeshExperiment::getViewerInfo() {
-	/*Camera cam = viewer->;
-	cam.
-	int *left, *top, *bottom, *right;
-	viewer->getContentsMargins(left,top, right, bottom);
-	output << "vieweroutput:"
-		<< "height: " << *top << "\n"
-		<< "width: " << *right
-		<< "\n";                        */      
+	ExaminerCameraController* controller = viewer->getController();
+	//int *left, *top, *bottom, *right;
+	//viewer->getContentsMargins(left,top, right, bottom);
+	output //<< "vieweroutput:"
+		//<< "height: " << *top << "\n"
+		//<< "width: " << *right
+		<< "position: " << controller->getCamera()->getPosition()
+		<< " lookat: " << controller->getCamera()->getLookAt()
+		<< " distance: " << controller->getDistance()
+		<< "\n";                           
 }

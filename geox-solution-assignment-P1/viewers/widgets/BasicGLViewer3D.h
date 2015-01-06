@@ -45,7 +45,7 @@ signals:
 	void      setBackgroundColor(Vector3f color){ui.glFrame->setBackgroundColor(color);};
 	void      setBackgroundColor(float red, float green, float blue){ui.glFrame->setBackgroundColor(red, green,blue);};
 	void      refresh() {ui.glFrame->updateGL();}
-
+	inline ExaminerCameraController* getController(){ return dynamic_cast<ExaminerCameraController*>(ui.glFrame->getCameraController());};
 	~BasicGLViewer3D();
 };
 
