@@ -188,8 +188,8 @@ void MyMeshExperiment::shootRays()
 
 bool MyMeshExperiment::checkShadow(tuple<Vector3f, Vector3f> ray, float distance)
 {
-	Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);
-	Vector3f light = makeVector3f(0, 0, 10) - hit;
+	Vector3f hit = (std::get<0>(ray) + std::get<1>(ray)*distance);				// <-- location of where ray hit triangle 
+	Vector3f light = makeVector3f(0, 0, 10) - hit;								// <-- intersection to lightsource vector
 	float newDistance;
 	TriangleRayIntersection* tri = new TriangleRayIntersection();
 
@@ -212,10 +212,9 @@ bool MyMeshExperiment::checkShadow(tuple<Vector3f, Vector3f> ray, float distance
 		pos[1] = pts->get<float32, 3>(tind[1], POS);
 		pos[2] = pts->get<float32, 3>(tind[2], POS);
 
-		bool intersect = tri->getIntersection(hit+light*0.01, light, pos, newDistance);
-		if (intersect)
-			if (newDistance <= 1)// && newDistance > 0.01)
-				return true;		//There is shadow.
+		bool intersect = tri->getIntersection(hit+light*0.01, light, pos, newDistance);				// <-- hit+light*0.01 prevents shadow dots 
+		if (intersect && newDistance <= 1)		// && newDistance > 0.01)
+			return true;		//There is shadow.
 	}
 	return false;
 }
