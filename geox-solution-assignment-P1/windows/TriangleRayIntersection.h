@@ -7,7 +7,7 @@ class TriangleRayIntersection
 public:
 	TriangleRayIntersection();
 	~TriangleRayIntersection();
-	bool getIntersection(Vector3f rayPosition, Vector3f rayDirection, Vector3f triangle[3], Vector3f &result);
+	bool getIntersection(Vector3f rayPosition, Vector3f rayDirection, Vector3f triangle[3], float &result);
 
 
 private:

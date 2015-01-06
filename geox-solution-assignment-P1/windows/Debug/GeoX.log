@@ -1,4 +1,4 @@
-﻿Build started 6-1-2015 14:56:22.
+﻿Build started 6-1-2015 16:37:47.
      1>Project "C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\GeoX.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\.." /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\application" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\experiments" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\geoX" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\math" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\basics" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\gui" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\misc" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\properties" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\streaming" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\viewers\cameraControl" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\viewers\widgets" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\geometry" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USE_MATH_DEFINES /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHa /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\GeoX.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt MyMeshExperiment.cpp
@@ -122,4 +122,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:00.89
+Time Elapsed 00:00:00.96

@@ -11,7 +11,7 @@ TriangleRayIntersection::~TriangleRayIntersection()
 {
 }
 
-bool TriangleRayIntersection::getIntersection(Vector3f rayPosition, Vector3f rayDirection, Vector3f pos[3], Vector3f &result)
+bool TriangleRayIntersection::getIntersection(Vector3f rayPosition, Vector3f rayDirection, Vector3f pos[3], float &result)
 {
 	float eps = 0.01;
 	float a, f, u, v;
@@ -44,7 +44,7 @@ bool TriangleRayIntersection::getIntersection(Vector3f rayPosition, Vector3f ray
 
 	if (t > 0) // ray intersection
 	{
-		result = rayPosition + rayDirection*t;
+		result = t;
 		return(true);
 	}
 

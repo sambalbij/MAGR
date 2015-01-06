@@ -22,6 +22,8 @@ private:
 	TriangleMesh *mesh;
 	SimpleGLMeshMaterial *renderer;
 	ExaminerCameraController* controller;
+	tuple<Vector3f, Vector3f> rays[101][101];
+	Vector3f colours[101][101];
 public:
 
 	MyMeshExperiment();
@@ -32,6 +34,7 @@ public:
 
 	void getViewerInfo();
 	void getRays();
+	void shootRays();
 
 
 	~MyMeshExperiment();

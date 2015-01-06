@@ -13,6 +13,7 @@
 //---------------------------------------------------------------------------
 #include "GeoXOutput.h"                         // <--- this include lets you output text in the main window
 #include "Camera.h"
+#include "TriangleRayIntersection.h"
 
 IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
 {
@@ -79,11 +80,11 @@ void MyMeshExperiment::getViewerInfo() {
 		<< " distance: " << controller->getDistance()
 		<< "\n";     
 	getRays();
+	shootRays();
 }
 
 void MyMeshExperiment::getRays()
 {	
-	tuple<Vector3f, Vector3f> rays [101][101];
 	controller = viewer->getController();
 	Vector3f lookat, position, right, up, view; 
 	lookat = controller->getCamera()->getLookAt();
@@ -102,5 +103,82 @@ void MyMeshExperiment::getRays()
 		rays[dx+50][dy+50] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
 
 		}
-	//tuple<Vector3f, Vector3f> ray = rays[50][50];
+	output << std::get<0>(rays[50][50]) << "  " << std::get<1>(rays[50][50])<<"\n";
 }
+
+void MyMeshExperiment::shootRays()
+{
+	TriangleRayIntersection* tri = new TriangleRayIntersection();
+
+	if (mesh == NULL) return;
+	DynamicArrayOfStructures *pts = mesh->getVertices();
+	if (!pts->providesAttribute("position")) return;
+	AAT POS = pts->getAAT("position");
+
+	AAT COL;
+	bool hasCol = pts->providesAttribute("color");
+	if (hasCol) COL = pts->getAAT("color");
+
+	DynamicArrayOfStructures *idx = mesh->getTriangles();
+	if (!idx->providesAttribute("index")) return;
+	AAT IDX = idx->getAAT("index");
+
+	//vector < MyTriangle > triangles;
+
+	// loop over rays
+	for (int x = 0; x <= 100; x++)
+	{
+		for (int y = 0; y <= 100; y++)
+		{
+			tuple<Vector3f, Vector3f> ray = rays[x][y];
+			float distance;
+			float minDistance = 99999;
+			int minDistanceId = -1;
+			Vector3f bestColour;
+
+			// loop over triangle
+			const card32 numTri = idx->getNumEntries();
+			for (card32 i = 0; i < numTri; i++) {
+				Vector3i tind = idx->get<int32, 3>(i, IDX);
+				Vector3f pos[3];
+				pos[0] = pts->get<float32, 3>(tind[0], POS);
+				pos[1] = pts->get<float32, 3>(tind[1], POS);
+				pos[2] = pts->get<float32, 3>(tind[2], POS);
+
+
+				// get intersection + distance
+				bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);
+				if (xt)
+					if (distance < minDistance)
+				{
+					minDistanceId = i; Vector3f colour[3];
+					colour[0] = pts->get<float32, 3>(tind[0], COL);
+					colour[1] = pts->get<float32, 3>(tind[1], COL);
+					colour[2] = pts->get<float32, 3>(tind[2], COL);
+					bestColour = colour[0] / 3 + colour[1] / 3 + colour[2] / 3;
+				}
+			}
+			if (minDistanceId == -1)
+			{
+				bestColour[0] = 0;
+				bestColour[1] = 0;
+				bestColour[2] = 0;
+			}
+			colours[x][y] = bestColour;
+		}//rays
+	}
+}
+/*
+MyTriangle t;
+t.pos[0] = pos[0];
+t.pos[1] = pos[1];
+t.pos[2] = pos[2];\
+
+triangles.push_back(t);
+
+struct MyTriangle
+{
+Vector3f pos[3];
+
+};
+*/
