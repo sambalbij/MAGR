@@ -86,6 +86,8 @@ void MyMeshExperiment::getViewerInfo() {
 
 void MyMeshExperiment::getRays()
 {	
+
+	int halfsize = size / 2;
 	controller = viewer->getController();
 	Vector3f lookat, position, right, up, view; 
 	lookat = controller->getCamera()->getLookAt();
@@ -93,18 +95,20 @@ void MyMeshExperiment::getRays()
 	view = lookat - position;
 	up = controller->getCamera()->getUp();
 	right = up.crossProduct(view);
+	up.normalize();
+	right.normalize();
 	float distance = controller->getDistance();
 
-	for (int dx = -50; dx <= 50;dx++)
-		for (int dy = -50; dy <= 50; dy++)
+	for (int dx = -halfsize; dx <= halfsize; dx++)
+		for (int dy = -halfsize; dy <= halfsize; dy++)
 		{
-		Vector3f dr = right * distance * dx / 50;
-		Vector3f du = up * distance * dy / 50;
-		Vector3f pixelpos = lookat + dr + du;
-		rays[dx+50][dy+50] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
+		Vector3f dr = right * distance * dx / halfsize;
+		Vector3f du = up * distance * dy / halfsize;
+		Vector3f pixelpos = lookat - dr - du;
+		rays[dx + halfsize][dy + halfsize] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
 
 		}
-	output << std::get<0>(rays[50][50]) << "  " << std::get<1>(rays[50][50])<<"\n";
+	output << std::get<0>(rays[halfsize][halfsize]) << "  " << std::get<1>(rays[50][50]) << "\n";
 }
 
 void MyMeshExperiment::shootRays()
@@ -127,9 +131,9 @@ void MyMeshExperiment::shootRays()
 	//vector < MyTriangle > triangles;
 
 	// loop over rays
-	for (int x = 0; x <= 100; x++)
+	for (int x = 0; x <= size; x++)
 	{
-		for (int y = 0; y <= 100; y++)
+		for (int y = 0; y <= size; y++)
 		{
 			tuple<Vector3f, Vector3f> ray = rays[x][y];
 			float distance;
@@ -173,10 +177,10 @@ void MyMeshExperiment::shootRays()
 
 void MyMeshExperiment::saveImage()
 {
-	QImage image(101, 101, QImage::Format_RGB32);
-	for (int x = 0; x <= 100; x++)
+	QImage image(size + 1, size+1, QImage::Format_RGB32);
+	for (int x = 0; x <= size; x++)
 	{
-		for (int y = 0; y <= 100; y++)
+		for (int y = 0; y <= size; y++)
 		{
 			image.setPixel(x, y, qRgb(int(colours[x][y][0] * 255), int(colours[x][y][1] * 255), int(colours[x][y][2] * 255)));
 		}
