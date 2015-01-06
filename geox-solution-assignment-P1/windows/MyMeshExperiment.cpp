@@ -136,49 +136,45 @@ void MyMeshExperiment::shootRays()
 		for (int y = 0; y <= size; y++)
 		{
 			tuple<Vector3f, Vector3f> ray = rays[x][y];
-			float distance;
-			float minDistance = 99999;
-			int minDistanceId = -1;
+			float distance;											// <-- scalar multiplied with ray direction is distance
+			float minDistance = 99999;								// <-- used to find nearest triangle
+			int minDistanceId = -1;									// <-- check for background
 			Vector3f bestColour;
 
 			// loop over triangle
 			const card32 numTri = idx->getNumEntries();
 			for (card32 i = 0; i < numTri; i++) {
-				Vector3i tind = idx->get<int32, 3>(i, IDX);
-				Vector3f pos[3];
+				Vector3i tind = idx->get<int32, 3>(i, IDX);			// triangle index of vertices (comes from triangle dynamic thing)
+				Vector3f pos[3];									// position of all vertices of the triangle
 				pos[0] = pts->get<float32, 3>(tind[0], POS);
 				pos[1] = pts->get<float32, 3>(tind[1], POS);
 				pos[2] = pts->get<float32, 3>(tind[2], POS);
 
 
 				// get intersection + distance
-				bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);
+				bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);		// <-- distance is a result
 				if (xt)
-					if (distance < minDistance)
+					if (distance < minDistance)						// <-- check if closest
 				{
-					minDistance = distance;
-					bool shadow = checkShadow(ray, distance);
+					minDistance = distance;							// <-- set current triangle as closest
+					bool shadow = checkShadow(ray, distance);		// <-- check if there are triangles blocking the light
 					
-					minDistanceId = i; 
+					minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing
 					Vector3f colour[3];
 					colour[0] = pts->get<float32, 3>(tind[0], COL);
 					colour[1] = pts->get<float32, 3>(tind[1], COL);
 					colour[2] = pts->get<float32, 3>(tind[2], COL);
+
 					if (!shadow)
-						bestColour = colour[0] / 3 + colour[1] / 3 + colour[2] / 3;
+						bestColour = ( colour[0] + colour[1] + colour[2] ) / 3;
 					else
 					{
-						bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
-						//bestColour[1] = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
-						//bestColour[2] = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
-
-						//bestColour[0] = 0;
-						//bestColour[1] = 0;
-						//bestColour[2] = 0;
+						bestColour = (colour[0] + colour[1] + colour[2] ) / 0.9;
+						//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
 					}
 				}
 			}
-			if (minDistanceId == -1)
+			if (minDistanceId == -1) // <-- no collision so no colour
 			{
 				bestColour[0] = 0;
 				bestColour[1] = 0;
