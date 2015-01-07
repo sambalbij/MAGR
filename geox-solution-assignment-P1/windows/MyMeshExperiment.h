@@ -22,9 +22,9 @@ private:
 	TriangleMesh *mesh;
 	SimpleGLMeshMaterial *renderer;
 	ExaminerCameraController* controller;
-	tuple<Vector3f, Vector3f> rays[1001][1001];
-	Vector3f colours[1001][1001];
-	int size = 1000;
+	tuple<Vector3f, Vector3f> rays[101][101];
+	Vector3f colours[101][101];
+	int 	size = 100;
 public:
 
 	MyMeshExperiment();
