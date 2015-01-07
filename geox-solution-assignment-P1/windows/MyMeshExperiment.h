@@ -22,9 +22,9 @@ private:
 	TriangleMesh *mesh;
 	SimpleGLMeshMaterial *renderer;
 	ExaminerCameraController* controller;
-	tuple<Vector3f, Vector3f> rays[101][101];
-	Vector3f colours[101][101];
-	int 	size = 100;
+	tuple<Vector3f, Vector3f> rays[201][201];
+	Vector3f colours[201][201];
+	int 	size = 200;
 public:
 
 	MyMeshExperiment();
@@ -38,6 +38,7 @@ public:
 	void shootRays();
 	bool checkShadow(tuple<Vector3f, Vector3f>, float);
 
+	int32 gridSize;
 	Vector3f incomingRay;                           // <---
 	Vector3f vertex1;
 	Vector3f vertex2;
