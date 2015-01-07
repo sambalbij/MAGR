@@ -182,35 +182,45 @@ void MyMeshExperiment::shootRays()
 			const card32 numTri = idx->getNumEntries();
 			for (card32 i = 0; i < numTri; i++) {
 				Vector3i tind = idx->get<int32, 3>(i, IDX);			// <-- triangle index of vertices (comes from triangle dynamic thing)
-				Vector3f pos[3];									// <-- position of all vertices of the triangle
-				pos[0] = pts->get<float32, 3>(tind[0], POS);
-				pos[1] = pts->get<float32, 3>(tind[1], POS);
-				pos[2] = pts->get<float32, 3>(tind[2], POS);
+				Vector3f triangle[3];									// <-- position of all vertices of the triangle
+				triangle[0] = pts->get<float32, 3>(tind[0], POS);
+				triangle[1] = pts->get<float32, 3>(tind[1], POS);
+				triangle[2] = pts->get<float32, 3>(tind[2], POS);
 
 
 				// get intersection + distance
-				bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);		// <-- distance is a result
+				bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), triangle, distance);		// <-- distance is a result
 				if (xt)
 					if (distance < minDistance)						// <-- check if closest
 					{
-						getOutgoingReflection(std::get<1>(ray), pos, outgoingRay); // get outgoing ray for reflection
+					getOutgoingReflection(std::get<1>(ray), triangle, outgoingRay); // get outgoing ray for reflection
 
-						minDistance = distance;							// <-- set current triangle as closest
-						bool shadow = checkShadow(ray, distance);		// <-- check if there are triangles blocking the light
+					minDistance = distance;							// <-- set current triangle as closest
+					bool shadow = checkShadow(ray, distance);		// <-- check if there are triangles blocking the light
 
-						minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing
-						Vector3f colour[3];
-						colour[0] = pts->get<float32, 3>(tind[0], COL);
-						colour[1] = pts->get<float32, 3>(tind[1], COL);
-						colour[2] = pts->get<float32, 3>(tind[2], COL);
+					minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing
+					// calculations for local shading
+					Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);				// <-- location of where ray hit triangle 
+					Vector3f light = makeVector3f(0, 0, 5) - hit;								// <-- intersection to lightsource vector
+					Vector3f normal;
+					calculateSurfaceNormal(triangle, normal);
+					light.normalize();
+					normal.normalize();
+					normal = makeVector3f(0, 0, 0) - normal;
+					float weight =std::abs(light * normal);
+					
+					/*Vector3f colour[3];
+					colour[0] = pts->get<float32, 3>(tind[0], COL);
+					colour[1] = pts->get<float32, 3>(tind[1], COL);
+					colour[2] = pts->get<float32, 3>(tind[2], COL);*/
 
-						if (!shadow)
-							bestColour = (colour[0] + colour[1] + colour[2]) / 3;
-						else
-						{
-							bestColour = (colour[0] + colour[1] + colour[2]) /9;
-							//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
-						}
+					if (!shadow)
+						bestColour = makeVector3f((weight + 0.1f) / 1.1f, (weight + 0.1f) / 1.1f, (weight + 0.1f) / 1.1f);//(colour[0] + colour[1] + colour[2]) / 3;
+					else
+					{
+						bestColour = makeVector3f(0.1, 0.1, 0.1);
+						//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
+					}
 					}
 			}
 			if (minDistanceId == -1) // <-- no collision so no colour
@@ -221,15 +231,11 @@ void MyMeshExperiment::shootRays()
 			}
 			else // do reflection
 			{
-				if (x == 100 && y == 100)
-					int sad = 0;
 				// REFLECTION CALCULATION
 				float distance2;											// <-- scalar multiplied with ray direction is distance
 				float minDistance2 = 99999;								// <-- used to find nearest triangle
 				int minDistanceId2 = -1;									// <-- check for background
 				Vector3f bestColour2;
-
-
 
 				Vector3f hit = std::get<0>(ray) +std::get<1>(ray)*minDistance;
 				thereWasARefelction = false;
@@ -457,7 +463,7 @@ void MyMeshExperiment::getOutgoingReflection(Vector3f incomingRay, Vector3f tria
 bool MyMeshExperiment::checkShadow(tuple<Vector3f, Vector3f> ray, float distance)
 {
 	Vector3f hit = (std::get<0>(ray) + std::get<1>(ray)*distance);				// <-- location of where ray hit triangle 
-	Vector3f light = makeVector3f(0, 0, 10) - hit;								// <-- intersection to lightsource vector
+	Vector3f light = makeVector3f(0, 0, 5) - hit;								// <-- intersection to lightsource vector
 	float newDistance;
 	TriangleRayIntersection* tri = new TriangleRayIntersection();
 
