@@ -43,7 +43,9 @@ public:
 	Matrix3f triangleRefl;                           // <--- declare the parameters you need (will be registered in *.cpp file)
 
 	void calculateDot();
+	void calculateMatrixNormal();
 
+	void calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal);
 	void getOutgoingReflaction(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay);
 	void saveImage();
 

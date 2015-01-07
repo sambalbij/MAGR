@@ -22,6 +22,7 @@ IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
 		ADD_OBJECT_PROP(renderer, 0, SimpleGLMeshMaterial::getClass(), true)
 		ADD_NOARGS_METHOD(MyMeshExperiment::importMesh)
 		ADD_NOARGS_METHOD(MyMeshExperiment::calculateDot)
+		ADD_NOARGS_METHOD(MyMeshExperiment::calculateMatrixNormal)
 		ADD_NOARGS_METHOD(MyMeshExperiment::getViewerInfo)             // <--- get viewer info
 
 	ADD_SEPARATOR("Vectors & Matrices")          // 
@@ -98,7 +99,8 @@ void MyMeshExperiment::getViewerInfo() {
 	tris[1] = triangleRefl * makeVector3f(0, 1, 0);
 	tris[2] = triangleRefl * makeVector3f(0, 0, 1);
 	
-	output << "\nvertex1: " << tris[0] << "\n"
+	output << "\n (x, y, z)" << "\n";
+	output << "vertex1: " << tris[0] << "\n"
 		<< "vertex2: " << tris[1] << "\n"
 		<< "vertex3: " << tris[2] << "\n";
 
@@ -230,6 +232,26 @@ void MyMeshExperiment::calculateDot()
 {
 	output << "dot: " << incomingRay * vector2 << "\n";
 }
+void MyMeshExperiment::calculateMatrixNormal()
+{
+	Vector3f normal;
+	Vector3f tris[3];
+
+	tris[0] = triangleRefl * makeVector3f(1, 0, 0);
+	tris[1] = triangleRefl * makeVector3f(0, 1, 0);
+	tris[2] = triangleRefl * makeVector3f(0, 0, 1);
+
+	calculateSurfaceNormal(tris, normal);
+
+	output << "SurfaceNormal: " << normal << "\n";
+}
+
+void MyMeshExperiment::calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal)
+{
+	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));
+	normal = t / norm(t);
+}
+
 void MyMeshExperiment::getOutgoingReflaction(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay)
 {
 	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));
