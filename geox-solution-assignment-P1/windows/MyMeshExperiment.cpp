@@ -27,8 +27,10 @@ IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
 
 	ADD_SEPARATOR("Vectors & Matrices")          // 
 		ADD_VECTOR3F_PROP(incomingRay, 0)                // <---
-		ADD_VECTOR3F_PROP(vector2, 0)                // <---
-		ADD_MATRIX3F_PROP(triangleRefl, 0)                 // <---
+		ADD_VECTOR3F_PROP(vertex1, 0)                // <---
+		ADD_VECTOR3F_PROP(vertex2, 0)                // <---
+		ADD_VECTOR3F_PROP(vertex3, 0)                // <---
+		//ADD_MATRIX3F_PROP(triangleRefl, 0)                 // <---
 }
 
 QWidget *MyMeshExperiment::createViewer() {
@@ -44,10 +46,12 @@ MyMeshExperiment::MyMeshExperiment()
 	renderer = new SimpleGLMeshMaterial();
 
 	incomingRay = makeVector3f(0, 1, -1);
-	vector2 = makeVector3f(10, 10, 0);
-	triangleRefl = makeMatrix3f(0, 1, 0,
-		1, 0, 0,
-		0, 0, 0);
+	vertex1 = makeVector3f(0, 0, 0);
+	vertex2 = makeVector3f(0, 1, 0);
+	vertex3 = makeVector3f(1, 0, 0);
+	//triangleRefl = makeMatrix3f(0, 1, 0,
+	//	1, 0, 0,
+	//	0, 0, 0);
 }
 
 MyMeshExperiment::~MyMeshExperiment()
@@ -93,11 +97,8 @@ void MyMeshExperiment::getViewerInfo() {
 		<< " distance: " << controller->getDistance()
 		<< "\n";     
 	
-	Vector3f tris[3];
+	Vector3f tris[3] = {vertex1, vertex2, vertex3};
 
-	tris[0] = triangleRefl * makeVector3f(1, 0, 0);
-	tris[1] = triangleRefl * makeVector3f(0, 1, 0);
-	tris[2] = triangleRefl * makeVector3f(0, 0, 1);
 	
 	output << "\n (x, y, z)" << "\n";
 	output << "vertex1: " << tris[0] << "\n"
@@ -230,16 +231,16 @@ void MyMeshExperiment::shootRays()
 
 void MyMeshExperiment::calculateDot()
 {
-	output << "dot: " << incomingRay * vector2 << "\n";
+	output << "dot: " << incomingRay * vertex1 << "\n";
 }
 void MyMeshExperiment::calculateMatrixNormal()
 {
 	Vector3f normal;
-	Vector3f tris[3];
+	Vector3f tris[3] = { vertex1, vertex2, vertex3 };
 
-	tris[0] = triangleRefl * makeVector3f(1, 0, 0);
-	tris[1] = triangleRefl * makeVector3f(0, 1, 0);
-	tris[2] = triangleRefl * makeVector3f(0, 0, 1);
+	//tris[0] = triangleRefl * makeVector3f(1, 0, 0);
+	//tris[1] = triangleRefl * makeVector3f(0, 1, 0);
+	//tris[2] = triangleRefl * makeVector3f(0, 0, 1);
 
 	calculateSurfaceNormal(tris, normal);
 
@@ -248,7 +249,7 @@ void MyMeshExperiment::calculateMatrixNormal()
 
 void MyMeshExperiment::calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal)
 {
-	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));
+	Vector3f t = ((triangle[1] - triangle[0]).crossProduct(triangle[2] - triangle[0]));
 	normal = t / norm(t);
 }
 
@@ -257,11 +258,15 @@ void MyMeshExperiment::getOutgoingReflaction(Vector3f incomingRay, Vector3f tria
 	Vector3f normal;
 	calculateSurfaceNormal(triangle, normal);
 
-	Vector3f d = incomingRay.componentProduct(normal);
-	float dotProd = d[0] + d[1] + d[2];
-	outgoingRay = (incomingRay.operator*(2).operator*(dotProd).operator-(incomingRay));
 
-	//outgoingRay = (incomingRay - (normal * 2 ) * (incomingRay * normal));
+	/*Vector3f ri = incomingRay.operator*(-1);
+	Vector3f d = ri.componentProduct(normal);
+	float dotProd = d[0] + d[1] + d[2];
+	outgoingRay = (ri.operator*(2).operator*(dotProd).operator-(ri));*/
+
+	Vector3f incomingRayNormalized = incomingRay / norm(incomingRay);
+
+	outgoingRay = normal * ((normal * incomingRayNormalized) * 2) - incomingRayNormalized;
 	
 }
 

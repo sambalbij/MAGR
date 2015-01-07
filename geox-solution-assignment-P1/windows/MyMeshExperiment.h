@@ -39,8 +39,10 @@ public:
 	bool checkShadow(tuple<Vector3f, Vector3f>, float);
 
 	Vector3f incomingRay;                           // <---
-	Vector3f vector2;
-	Matrix3f triangleRefl;                           // <--- declare the parameters you need (will be registered in *.cpp file)
+	Vector3f vertex1;
+	Vector3f vertex2;
+	Vector3f vertex3;
+	//Matrix3f triangleRefl;                           // <--- declare the parameters you need (will be registered in *.cpp file)
 
 	void calculateDot();
 	void calculateMatrixNormal();
