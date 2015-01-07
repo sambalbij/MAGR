@@ -18,14 +18,18 @@ class SimpleGLMeshMaterial;
 class MyMeshExperiment: public Experiment, public RenderableObject {
 	GEOX_CLASS(MyMeshExperiment)
 private:
+	const static int rayContainerSize = 101;
+	const static int imageSize = 100;
+	const static int numberOfRandomRays = 3;			// <-- there will be an  extra added for the centre of the pixel
+
 	BasicGLViewer3D* viewer;
 	TriangleMesh *mesh;
 	SimpleGLMeshMaterial *renderer;
 	ExaminerCameraController* controller;
-	tuple<Vector3f, Vector3f> rays[101][101][4]; //[Heighth][Width][numRays]. 1-3 reserved for random, 4 for center ray.
-	Vector3f colours[101][101];
-	Vector3f colorOfRays[4];
-	int 	size = 100;
+	tuple<Vector3f, Vector3f> rays[rayContainerSize][rayContainerSize][numberOfRandomRays+1]; //[Heighth][Width][numRays]. 1-3 reserved for random, 4 for center ray.
+	Vector3f colours[rayContainerSize][rayContainerSize];
+	Vector3f colorOfRays[numberOfRandomRays+1];
+	int 	size = imageSize;
 public:
 
 	MyMeshExperiment();

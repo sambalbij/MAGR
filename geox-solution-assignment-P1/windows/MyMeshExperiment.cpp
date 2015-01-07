@@ -151,8 +151,7 @@ void MyMeshExperiment::getRays()
 			pixeldu = up * distance / halfsize;
 
 			// Random rays.
-			int numRandomRays = 3;
-			for (int i = 0; i < numRandomRays; ++i)
+			for (int i = 0; i < numberOfRandomRays; ++i)
 				{
 					rndR = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
 					rndU = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
@@ -192,12 +191,14 @@ void MyMeshExperiment::shootRays()
 
 	//vector < MyTriangle > triangles;
 
+
+	int allSubRays = numberOfRandomRays + 1;
 	// loop over rays
 	for (int x = 0; x <= size; x++)
 	{
 		for (int y = 0; y <= size; y++)
 		{
-			for (int r = 0; r < 4; ++r)
+			for (int r = 0; r < allSubRays; ++r)
 			{
 				tuple<Vector3f, Vector3f> ray = rays[x][y][r];
 				float distance;											// <-- scalar multiplied with ray direction is distance
@@ -218,12 +219,6 @@ void MyMeshExperiment::shootRays()
 					pos[1] = pts->get<float32, 3>(tind[1], POS);
 					pos[2] = pts->get<float32, 3>(tind[2], POS);
 
-					if (x == 50 && y == 50)
-					{
-						output << "position 0: " << pos[0][0] << "\n";
-						output << "position 1: " << pos[1] << "\n";
-						output << "position 2: " << pos[2] << "\n";
-					}
 
 					// get intersection + distance
 					bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);		// <-- distance is a result
