@@ -43,10 +43,10 @@ MyMeshExperiment::MyMeshExperiment()
 	mesh = NULL;
 	renderer = new SimpleGLMeshMaterial();
 
-	incomingRay = makeVector3f(1, -1, 0);
+	incomingRay = makeVector3f(0, 1, -1);
 	vector2 = makeVector3f(10, 10, 0);
 	triangleRefl = makeMatrix3f(0, 1, 0,
-		0, 0, 1,
+		1, 0, 0,
 		0, 0, 0);
 }
 
@@ -108,7 +108,7 @@ void MyMeshExperiment::getViewerInfo() {
 	getOutgoingReflaction(incomingRay, tris, outgoing);
 
 	output << "incoming: " << incomingRay << "\n";
-	output << "outgoing: " << outgoing;
+	output << "outgoing: " << outgoing << "\n";
 
 	/*getRays();
 	shootRays();
@@ -254,14 +254,14 @@ void MyMeshExperiment::calculateSurfaceNormal(Vector3f triangle[3], Vector3f &no
 
 void MyMeshExperiment::getOutgoingReflaction(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay)
 {
-	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));
-	t = t / norm(t);
-	Vector3f d = incomingRay.componentProduct(t);
+	Vector3f normal;
+	calculateSurfaceNormal(triangle, normal);
+
+	Vector3f d = incomingRay.componentProduct(normal);
 	float dotProd = d[0] + d[1] + d[2];
 	outgoingRay = (incomingRay.operator*(2).operator*(dotProd).operator-(incomingRay));
-	/*Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));	
-	t = t/norm(t);
-	outgoingRay = (rayDirection - (t * 2 ) * (rayDirection * t));*/
+
+	//outgoingRay = (incomingRay - (normal * 2 ) * (incomingRay * normal));
 	
 }
 

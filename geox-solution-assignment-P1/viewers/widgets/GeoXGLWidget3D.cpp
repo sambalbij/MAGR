@@ -152,16 +152,16 @@ void GeoXGLWidget3D::drawAxis()
 	if(lightOnOff)
 		glDisable(GL_LIGHTING);
 	glLineWidth(1.0f);
-	glColor4f(1.0f,0.0f,0.0f,1.0f);
+	glColor4f(1.0f,0.0f,0.0f,1.0f);			// R
 	glBegin(GL_LINES);
 	glVertex3f(-2000.0f, 0.0f, 0.0f);
 	glVertex3f( 2000.0f, 0.0f, 0.0f);
 	glEnd();
-	glColor4f(0.0f,1.0f,0.0f,1.0f);
+	glColor4f(0.0f,1.0f,0.0f,1.0f);			// G
 	glBegin(GL_LINES);
 	glVertex3f(0.0f, -2000.0f, 0.0f);
 	glVertex3f(0.0f,  2000.0f, 0.0f);
-	glColor4f(0.0f,0.0f,1.0f,1.0f);
+	glColor4f(0.0f,0.0f,1.0f,1.0f);			// B
 	glBegin(GL_LINES);
 	glVertex3f(0.0f, 0.0f, -2000.0f);
 	glVertex3f(0.0f, 0.0f,  2000.0f);
