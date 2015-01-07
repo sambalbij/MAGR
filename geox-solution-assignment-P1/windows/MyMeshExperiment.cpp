@@ -106,14 +106,14 @@ void MyMeshExperiment::getViewerInfo() {
 		<< "vertex3: " << tris[2] << "\n";
 
 	Vector3f outgoing;
-	getOutgoingReflaction(incomingRay, tris, outgoing);
+	getOutgoingReflection(incomingRay, tris, outgoing);
 
 	output << "incoming: " << incomingRay << "\n";
 	output << "outgoing: " << outgoing << "\n";
 
-	/*getRays();
+	getRays();
 	shootRays();
-	saveImage();*/
+	saveImage();
 }
 
 void MyMeshExperiment::getRays()
@@ -205,9 +205,55 @@ void MyMeshExperiment::shootRays()
 
 
 					// REFLECTION CALCULATION
-					// Needed point, normal of point
+					if (reflectionDepth)
+					{
+						float distance2;											// <-- scalar multiplied with ray direction is distance
+						float minDistance2 = 99999;								// <-- used to find nearest triangle
+						int minDistanceId2 = -1;									// <-- check for background
+						Vector3f bestColour2;
 
 
+						Vector3f outgoingRay;
+						getOutgoingReflection(std::get<1>(ray), pos, outgoingRay);
+
+						for (card32 j = 0; j < numTri; j++) {
+							Vector3i tind2 = idx->get<int32, 3>(j, IDX);			// <-- triangle index of vertices (comes from triangle dynamic thing)
+							Vector3f pos2[3];									// <-- position of all vertices of the triangle
+							pos2[0] = pts->get<float32, 3>(tind2[0], POS);
+							pos2[1] = pts->get<float32, 3>(tind2[1], POS);
+							pos2[2] = pts->get<float32, 3>(tind2[2], POS);
+
+
+							// get intersection + distance
+							bool xt2 = tri->getIntersection(std::get<1>(ray)*distance, outgoingRay, pos2, distance2);		// <-- distance is a result
+							if (xt2)
+								if (distance2 < minDistance2)						// <-- check if closest
+								{
+									minDistance2 = distance2;							// <-- set current triangle as closest
+									bool shadow2 = checkShadow(tuple<Vector3f, Vector3f>(std::get<1>(ray)*distance, outgoingRay), distance2);		// <-- check if there are triangles blocking the light
+
+									minDistanceId2 = j;								// <-- a check to see if current current triangle is closer than existing
+									Vector3f colour2[3];
+									colour2[0] = pts->get<float32, 3>(tind2[0], COL);
+									colour2[1] = pts->get<float32, 3>(tind2[1], COL);
+									colour2[2] = pts->get<float32, 3>(tind2[2], COL);
+
+									if (!shadow2)
+										bestColour2 = (colour2[0] + colour2[1] + colour2[2]) / 3;
+									else
+									{
+										bestColour2 = (colour2[0] + colour2[1] + colour2[2]) / 0.9;
+									}
+								}
+						}
+						if (minDistanceId2 == -1) // <-- no collision so no colour
+						{
+							bestColour2[0] = 0;
+							bestColour2[1] = 0;
+							bestColour2[2] = 0;
+						}
+						colours[x][y] = bestColour2;
+					}
 					if (!shadow)
 						bestColour = ( colour[0] + colour[1] + colour[2] ) / 3;
 					else
@@ -223,7 +269,10 @@ void MyMeshExperiment::shootRays()
 				bestColour[1] = 0;
 				bestColour[2] = 0;
 			}
-			colours[x][y] = bestColour;
+			if (!reflectionDepth)
+				colours[x][y] = bestColour;
+			else
+				colours[x][y] = bestColour*0.7 + colours[x][y] * 0.3;
 		}//rays
 	}
 	delete tri;
@@ -233,6 +282,7 @@ void MyMeshExperiment::calculateDot()
 {
 	output << "dot: " << incomingRay * vertex1 << "\n";
 }
+
 void MyMeshExperiment::calculateMatrixNormal()
 {
 	Vector3f normal;
@@ -249,24 +299,28 @@ void MyMeshExperiment::calculateMatrixNormal()
 
 void MyMeshExperiment::calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal)
 {
-	Vector3f t = ((triangle[1] - triangle[0]).crossProduct(triangle[2] - triangle[0]));
+	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));
 	normal = t / norm(t);
 }
 
-void MyMeshExperiment::getOutgoingReflaction(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay)
+void MyMeshExperiment::getOutgoingReflection(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay)
 {
 	Vector3f normal;
 	calculateSurfaceNormal(triangle, normal);
 
+	Vector3f ri = incomingRay;
+	Vector3f d = ri.componentProduct(normal);
+	float dotProd = d[0] + d[1] + d[2];
+	outgoingRay = ri - (normal.operator*(2)).operator*(dotProd);
 
 	/*Vector3f ri = incomingRay.operator*(-1);
 	Vector3f d = ri.componentProduct(normal);
 	float dotProd = d[0] + d[1] + d[2];
 	outgoingRay = (ri.operator*(2).operator*(dotProd).operator-(ri));*/
 
-	Vector3f incomingRayNormalized = incomingRay / norm(incomingRay);
+	/*Vector3f incomingRayNormalized = incomingRay / norm(incomingRay);
 
-	outgoingRay = normal * ((normal * incomingRayNormalized) * 2) - incomingRayNormalized;
+	outgoingRay = normal * ((normal * incomingRayNormalized) * 2) - incomingRayNormalized;*/
 	
 }
 

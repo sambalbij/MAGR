@@ -48,7 +48,7 @@ public:
 	void calculateMatrixNormal();
 
 	void calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal);
-	void getOutgoingReflaction(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay);
+	void getOutgoingReflection(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay);
 	void saveImage();
 
 
