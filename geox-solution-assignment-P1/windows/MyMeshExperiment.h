@@ -39,11 +39,14 @@ public:
 	bool checkShadow(tuple<Vector3f, Vector3f>, float);
 
 	Vector3f incomingRay;                           // <---
+	Vector3f vector2;
 	Matrix3f triangleRefl;                           // <--- declare the parameters you need (will be registered in *.cpp file)
 
-	
-	void getOutgoingReflaction(Vector3f rayDirection, Vector3f triangle[3], Vector3f &outgoingRay);
+	void calculateDot();
+
+	void getOutgoingReflaction(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay);
 	void saveImage();
+
 
 	~MyMeshExperiment();
 };

@@ -21,10 +21,12 @@ IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
 	ADD_OBJECT_PROP(mesh, 0, TriangleMesh::getClass(), true)
 		ADD_OBJECT_PROP(renderer, 0, SimpleGLMeshMaterial::getClass(), true)
 		ADD_NOARGS_METHOD(MyMeshExperiment::importMesh)
+		ADD_NOARGS_METHOD(MyMeshExperiment::calculateDot)
 		ADD_NOARGS_METHOD(MyMeshExperiment::getViewerInfo)             // <--- get viewer info
 
 	ADD_SEPARATOR("Vectors & Matrices")          // 
 		ADD_VECTOR3F_PROP(incomingRay, 0)                // <---
+		ADD_VECTOR3F_PROP(vector2, 0)                // <---
 		ADD_MATRIX3F_PROP(triangleRefl, 0)                 // <---
 }
 
@@ -41,9 +43,10 @@ MyMeshExperiment::MyMeshExperiment()
 	renderer = new SimpleGLMeshMaterial();
 
 	incomingRay = makeVector3f(1, -1, 0);
-	triangleRefl = makeMatrix3f(1, 2, 3,
-		4, 5, 6,
-		7, 8, 9);
+	vector2 = makeVector3f(10, 10, 0);
+	triangleRefl = makeMatrix3f(0, 1, 0,
+		0, 0, 1,
+		0, 0, 0);
 }
 
 MyMeshExperiment::~MyMeshExperiment()
@@ -91,13 +94,18 @@ void MyMeshExperiment::getViewerInfo() {
 	
 	Vector3f tris[3];
 
-	tris[0] = triangleRefl * makeVector3f(1,0,0);
+	tris[0] = triangleRefl * makeVector3f(1, 0, 0);
 	tris[1] = triangleRefl * makeVector3f(0, 1, 0);
 	tris[2] = triangleRefl * makeVector3f(0, 0, 1);
+	
+	output << "\nvertex1: " << tris[0] << "\n"
+		<< "vertex2: " << tris[1] << "\n"
+		<< "vertex3: " << tris[2] << "\n";
 
 	Vector3f outgoing;
 	getOutgoingReflaction(incomingRay, tris, outgoing);
 
+	output << "incoming: " << incomingRay << "\n";
 	output << "outgoing: " << outgoing;
 
 	/*getRays();
@@ -218,11 +226,20 @@ void MyMeshExperiment::shootRays()
 	delete tri;
 }
 
-void MyMeshExperiment::getOutgoingReflaction(Vector3f rayDirection, Vector3f triangle[3], Vector3f &outgoingRay)
+void MyMeshExperiment::calculateDot()
 {
-	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));	
+	output << "dot: " << incomingRay * vector2 << "\n";
+}
+void MyMeshExperiment::getOutgoingReflaction(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay)
+{
+	Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));
+	t = t / norm(t);
+	Vector3f d = incomingRay.componentProduct(t);
+	float dotProd = d[0] + d[1] + d[2];
+	outgoingRay = (incomingRay.operator*(2).operator*(dotProd).operator-(incomingRay));
+	/*Vector3f t = ((triangle[2] - triangle[0]).crossProduct(triangle[1] - triangle[0]));	
 	t = t/norm(t);
-	outgoingRay = (rayDirection - (t * 2 ) * (rayDirection * t));
+	outgoingRay = (rayDirection - (t * 2 ) * (rayDirection * t));*/
 	
 }
 
