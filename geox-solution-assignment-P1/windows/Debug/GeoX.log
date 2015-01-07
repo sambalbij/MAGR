@@ -1,14 +1,13 @@
-﻿Build started 7-1-2015 9:42:39.
+﻿Build started 7-1-2015 11:09:41.
      1>Project "C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\GeoX.vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\.." /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\application" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\experiments" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\geoX" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\math" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\basics" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\gui" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\misc" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\properties" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\system\streaming" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\viewers\cameraControl" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\viewers\widgets" /I"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\\..\geometry" /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _WINDOWS /D _USE_MATH_DEFINES /D _CRT_SECURE_NO_WARNINGS /D _UNICODE /D UNICODE /Gm /EHa /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Yu"stdafx.h" /Fp"Debug\GeoX.pch" /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt MyMeshExperiment.cpp
          MyMeshExperiment.cpp
-     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(242): warning C4305: 'argument' : truncation from 'double' to 'const float'
-     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(269): warning C4305: 'argument' : truncation from 'double' to 'const float'
-     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(462): warning C4390: ';' : empty controlled statement found; is this the intent?
-     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(465): warning C4390: ';' : empty controlled statement found; is this the intent?
-     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(467): warning C4390: ';' : empty controlled statement found; is this the intent?
-     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(479): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(245): warning C4305: 'argument' : truncation from 'double' to 'const float'
+     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(466): warning C4390: ';' : empty controlled statement found; is this the intent?
+     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(469): warning C4390: ';' : empty controlled statement found; is this the intent?
+     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(471): warning C4390: ';' : empty controlled statement found; is this the intent?
+     1>c:\users\martijn\desktop\magr\geox-solution-assignment-p1\windows\mymeshexperiment.cpp(483): warning C4305: 'argument' : truncation from 'double' to 'const float'
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\Debug\GeoX.exe" /INCREMENTAL /NOLOGO qt5Cored.lib qt5Guid.lib qt5OpenGLd.lib qtmaind.lib Qt5Widgetsd.lib winmm.lib opengl32.lib glu32.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\Debug\GeoX.pdb" /SUBSYSTEM:WINDOWS /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\Debug\GeoX.lib" /MACHINE:X86 /SAFESEH Debug\MeshImporterExperiment.obj
          Debug\SimpleGLMeshMaterial.obj
@@ -123,9 +122,10 @@
          Debug\ExampleExperimentMarchingCubes.obj
          Debug\Experiment.obj
          Debug\InitGeoX.obj
+     1>MeshImporterExperiment.obj : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
          GeoX.vcxproj -> C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\Debug\GeoX.exe
      1>Done Building Project "C:\Users\Martijn\Desktop\MAGR\geox-solution-assignment-P1\windows\GeoX.vcxproj" (Build target(s)).
 
 Build succeeded.
 
-Time Elapsed 00:00:00.94
+Time Elapsed 00:00:01.50
