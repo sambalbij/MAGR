@@ -21,16 +21,16 @@ IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
 	ADD_OBJECT_PROP(mesh, 0, TriangleMesh::getClass(), true)
 		ADD_OBJECT_PROP(renderer, 0, SimpleGLMeshMaterial::getClass(), true)
 		ADD_NOARGS_METHOD(MyMeshExperiment::importMesh)
-		ADD_NOARGS_METHOD(MyMeshExperiment::calculateDot)
-		ADD_NOARGS_METHOD(MyMeshExperiment::calculateMatrixNormal)
+		//ADD_NOARGS_METHOD(MyMeshExperiment::calculateDot)
+		//ADD_NOARGS_METHOD(MyMeshExperiment::calculateMatrixNormal)
 		ADD_NOARGS_METHOD(MyMeshExperiment::getViewerInfo)             // <--- get viewer info
 
-	ADD_SEPARATOR("Vectors & Matrices")          // 
-		ADD_INT32_PROP(gridSize, 0)
-		ADD_VECTOR3F_PROP(incomingRay, 0)                // <---
-		ADD_VECTOR3F_PROP(vertex1, 0)                // <---
-		ADD_VECTOR3F_PROP(vertex2, 0)                // <---
-		ADD_VECTOR3F_PROP(vertex3, 0)                // <---
+	//ADD_SEPARATOR("Vectors & Matrices")          // 
+		//ADD_INT32_PROP(gridSize, 0)
+		//ADD_VECTOR3F_PROP(incomingRay, 0)                // <---
+		//ADD_VECTOR3F_PROP(vertex1, 0)                // <---
+		//ADD_VECTOR3F_PROP(vertex2, 0)                // <---
+		//ADD_VECTOR3F_PROP(vertex3, 0)                // <---
 }
 
 QWidget *MyMeshExperiment::createViewer() {
@@ -45,11 +45,11 @@ MyMeshExperiment::MyMeshExperiment()
 	mesh = NULL;
 	renderer = new SimpleGLMeshMaterial();
 
-	gridSize = -1;
-	incomingRay = makeVector3f(0, 1, -1);
-	vertex1 = makeVector3f(0, 0, 0);
-	vertex2 = makeVector3f(0, 1, 0);
-	vertex3 = makeVector3f(1, 0, 0);
+	//gridSize = -1;
+	//incomingRay = makeVector3f(0, 1, -1);
+	//vertex1 = makeVector3f(0, 0, 0);
+	//vertex2 = makeVector3f(0, 1, 0);
+	//vertex3 = makeVector3f(1, 0, 0);
 }
 
 MyMeshExperiment::~MyMeshExperiment()
@@ -86,24 +86,24 @@ void MyMeshExperiment::renderGL()
 void MyMeshExperiment::getViewerInfo() {
 	controller = viewer->getController();
 
-	//output	<< "position: " << controller->getCamera()->getPosition()
-	//	<< " lookat: " << controller->getCamera()->getLookAt()
-	//	<< " distance: " << controller->getDistance()
-	//	<< "\n";     
+	output	<< "position: " << controller->getCamera()->getPosition()
+		<< " lookat: " << controller->getCamera()->getLookAt()
+		<< " distance: " << controller->getDistance()
+		<< "\n";     
 	
-	Vector3f tris[3] = {vertex1, vertex2, vertex3};
+	//Vector3f tris[3] = {vertex1, vertex2, vertex3};
 
-	
-	output << "\n (x, y, z)" << "\n";
-	output << "vertex1: " << tris[0] << "\n"
-		<< "vertex2: " << tris[1] << "\n"
-		<< "vertex3: " << tris[2] << "\n";
+	//
+	//output << "\n (x, y, z)" << "\n";
+	//output << "vertex1: " << tris[0] << "\n"
+	//	<< "vertex2: " << tris[1] << "\n"
+	//	<< "vertex3: " << tris[2] << "\n";
 
-	Vector3f outgoing;
-	getOutgoingReflection(incomingRay, tris, outgoing);
+	//Vector3f outgoing;
+	//getOutgoingReflection(incomingRay, tris, outgoing);
 
-	output << "incoming: " << incomingRay << "\n";
-	output << "outgoing: " << outgoing << "\n";
+	//output << "incoming: " << incomingRay << "\n";
+	//output << "outgoing: " << outgoing << "\n";
 
 	getRays();
 	shootRays();
@@ -187,6 +187,12 @@ void MyMeshExperiment::shootRays()
 				pos[1] = pts->get<float32, 3>(tind[1], POS);
 				pos[2] = pts->get<float32, 3>(tind[2], POS);
 
+				if (x == 50 && y == 50)
+				{
+					output << "position 0: " << pos[0][0] << "\n";
+					output << "position 1: " << pos[1] << "\n";
+					output << "position 2: " << pos[2] << "\n";
+				}
 
 				// get intersection + distance
 				bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);		// <-- distance is a result
@@ -198,18 +204,28 @@ void MyMeshExperiment::shootRays()
 						minDistance = distance;							// <-- set current triangle as closest
 						bool shadow = checkShadow(ray, distance);		// <-- check if there are triangles blocking the light
 
-						minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing
-						Vector3f colour[3];
-						colour[0] = pts->get<float32, 3>(tind[0], COL);
-						colour[1] = pts->get<float32, 3>(tind[1], COL);
-						colour[2] = pts->get<float32, 3>(tind[2], COL);
+						minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing						
 
-						if (!shadow)
-							bestColour = (colour[0] + colour[1] + colour[2]) / 3;
+						Vector3f colour[3];
+
+						Vector3f hit = (std::get<0>(ray) + std::get<1>(ray)*distance);				// <-- location of where ray hit triangle 
+						if (fmod(hit[0] / 5, 2) == fmod(hit[1] / 5, 2))
+						{
+							bestColour = makeVector3f(0, 0, 0);
+						}
 						else
 						{
-							bestColour = (colour[0] + colour[1] + colour[2]) /9;
-							//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
+							colour[0] = pts->get<float32, 3>(tind[0], COL);
+							colour[1] = pts->get<float32, 3>(tind[1], COL);
+							colour[2] = pts->get<float32, 3>(tind[2], COL);
+
+							if (!shadow)
+								bestColour = (colour[0] + colour[1] + colour[2]) / 3;
+							else
+							{
+								bestColour = (colour[0] + colour[1] + colour[2]) / 9;
+								//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
+							}
 						}
 					}
 			}
@@ -408,23 +424,28 @@ void MyMeshExperiment::shootRays()
 //	delete tri;
 //}
 
-void MyMeshExperiment::calculateDot()
+//void MyMeshExperiment::calculateDot()
+//{
+//	output << "dot: " << incomingRay * vertex1 << "\n";
+//}
+
+//void MyMeshExperiment::calculateMatrixNormal()
+//{
+//	Vector3f normal;
+//	Vector3f tris[3] = { vertex1, vertex2, vertex3 };
+//
+//	//tris[0] = triangleRefl * makeVector3f(1, 0, 0);
+//	//tris[1] = triangleRefl * makeVector3f(0, 1, 0);
+//	//tris[2] = triangleRefl * makeVector3f(0, 0, 1);
+//
+//	calculateSurfaceNormal(tris, normal);
+//
+//	output << "SurfaceNormal: " << normal << "\n";
+//}
+
+void MyMeshExperiment::makeMeshChecker(Vector3f incomingRay, Vector3f triangle[3], float32 &colour)
 {
-	output << "dot: " << incomingRay * vertex1 << "\n";
-}
-
-void MyMeshExperiment::calculateMatrixNormal()
-{
-	Vector3f normal;
-	Vector3f tris[3] = { vertex1, vertex2, vertex3 };
-
-	//tris[0] = triangleRefl * makeVector3f(1, 0, 0);
-	//tris[1] = triangleRefl * makeVector3f(0, 1, 0);
-	//tris[2] = triangleRefl * makeVector3f(0, 0, 1);
-
-	calculateSurfaceNormal(tris, normal);
-
-	output << "SurfaceNormal: " << normal << "\n";
+	
 }
 
 void MyMeshExperiment::calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal)
