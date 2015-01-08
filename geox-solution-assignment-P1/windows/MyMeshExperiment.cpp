@@ -235,7 +235,7 @@ void MyMeshExperiment::shootRays()
 						//Vector3f colour[3];
 
 						Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);	// <-- location of where ray hit triangle 
-						hits[x][y][r] = hit;
+						hits[x][y][r] = hit;							// <-- used when using gausian AA
 						if (mod(hit[0] / 5, 2) == mod(hit[1] / 5, 2))
 						{
 							bestColour = makeVector3f(1, 0, 0);
@@ -260,10 +260,8 @@ void MyMeshExperiment::shootRays()
 					bestColour[1] = 0;
 					bestColour[2] = 0;
 				}
-				/*else // do reflection
+				else // do reflection
 				{
-					if (x == 100 && y == 100)
-						int sad = 0;
 					// REFLECTION CALCULATION
 					float distance2;											// <-- scalar multiplied with ray direction is distance
 					float minDistance2 = 99999;								// <-- used to find nearest triangle
@@ -307,30 +305,30 @@ void MyMeshExperiment::shootRays()
 						bestColour2[2] = 0;
 					}
 					//colours[x][y] = bestColour2;
-				}*/
+				}
 				if (!thereWasARefelction)
-					binnedCoulours[x][y][r] = bestColour;
-					//colorOfRays[r] = bestColour;
-					//colours[x][y] = bestColour;
+					binnedCoulours[x][y][r] = bestColour;// <-- used for gausians
+					//colorOfRays[r] = bestColour; // <-- used for random rays
+					//colours[x][y] = bestColour; // <-- used for no AA
 				else
-					binnedCoulours[x][y][r] = bestColour;
-					//colorOfRays[r] = bestColour*0.5 + bestColour2 * 0.5;
-					//colours[x][y] = bestColour*0.5 + bestColour2 * 0.5;
+					binnedCoulours[x][y][r] = bestColour; // <-- used for gausians
+					//colorOfRays[r] = bestColour*0.5 + bestColour2 * 0.5; // <-- used fo random rays
+					//colours[x][y] = bestColour*0.5 + bestColour2 * 0.5; //<-- used for no AA
 			}
-			 //colours[x][y] = colorOfRays[3]; // Center ray color.
-			 //colours[x][y] = (colorOfRays[0] + colorOfRays[1] + colorOfRays[2]) / 3;	// Average of random rays colors.
+			 //colours[x][y] = colorOfRays[3]; // Center ray color. 
+			 colours[x][y] = (colorOfRays[0] + colorOfRays[1] + colorOfRays[2]) / 3;	// Average of random rays colors.
 		}//rays
 	}
-	// now we have all samples we can do gausians
-	for (int x = 0; x <= size; x++)
-		for (int y = 0; y <= size; y++)
-			colours[x][y] = GetGausianColor(x, y);
+	// now we have all samples we can do gausians 
+	for (int x = 0; x <= size; x++) // (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
+		for (int y = 0; y <= size; y++) // (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
+			colours[x][y] = GetGausianColor(x, y); // (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
 	delete tri;
 }
 
 Vector3f MyMeshExperiment::GetGausianColor(int x, int y)
 {
-	float sigma = 0.5;
+	float sigma = 4;
 	float totalWeight =0;
 	Vector3f colour = makeVector3f(0,0,0);
 	float weight = 0;
