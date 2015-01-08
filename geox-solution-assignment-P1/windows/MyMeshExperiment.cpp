@@ -173,7 +173,11 @@ void MyMeshExperiment::getRays()
 						randomdu = pixeldu.operator*(rndU) / gridSize;
 						newPixelpos = pixelpos + randomdr + randomdu;
 					}
-					
+					else
+					{
+						newPixelpos = pixelpos + pixeldr / gridSize + pixeldu / gridSize;
+					}
+
 					raysGridded[dx + halfsize][dy + halfsize][currentRayInGrid] = tuple<Vector3f, Vector3f>(position, newPixelpos - position);
 
 				}
