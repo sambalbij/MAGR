@@ -18,20 +18,19 @@ class SimpleGLMeshMaterial;
 class MyMeshExperiment: public Experiment, public RenderableObject {
 	GEOX_CLASS(MyMeshExperiment)
 private:
-	const static int rayContainerSize = 101;
-	const static int imageSize = 100;
-	const static int numberOfRandomRays = 3;			// <-- there will be an  extra added for the centre of the pixel
-
 	BasicGLViewer3D* viewer;
 	TriangleMesh *mesh;
 	SimpleGLMeshMaterial *renderer;
 	ExaminerCameraController* controller;
-	tuple<Vector3f, Vector3f> rays[rayContainerSize][rayContainerSize][numberOfRandomRays+1]; //[Heighth][Width][numRays]. 1-3 reserved for random, 4 for center ray.
-	Vector3f colours[rayContainerSize][rayContainerSize];
-	Vector3f colorOfRays[numberOfRandomRays+1];
-	Vector3f hits[rayContainerSize][rayContainerSize][numberOfRandomRays + 1];
-	Vector3f binnedCoulours[rayContainerSize][rayContainerSize][numberOfRandomRays + 1];
-	int 	size = imageSize;
+<<<<<<< HEAD
+	tuple<Vector3f, Vector3f> rays[1001][1001];
+	Vector3f colours[1001][1001];
+	int size = 1000;
+=======
+	tuple<Vector3f, Vector3f> rays[101][101];
+	Vector3f colours[101][101];
+	int 	size = 100;
+>>>>>>> a2a850c1f05cae9a3ff32ad024d784b8e6394cff
 public:
 
 	MyMeshExperiment();
@@ -44,25 +43,20 @@ public:
 	void getRays();
 	void shootRays();
 	bool checkShadow(tuple<Vector3f, Vector3f>, float);
-	int mod(float, int);
 
-	//int32 gridSize;
-	//Vector3f incomingRay;                           // <---
-	//Vector3f vertex1;
-	//Vector3f vertex2;
-	//Vector3f vertex3;
+	int32 gridSize;
+	Vector3f incomingRay;                           // <---
+	Vector3f vertex1;
+	Vector3f vertex2;
+	Vector3f vertex3;
 	//Matrix3f triangleRefl;                           // <--- declare the parameters you need (will be registered in *.cpp file)
 
 	void calculateDot();
 	void calculateMatrixNormal();
 
-	void makeMeshChecker(Vector3f incromingRay, Vector3f triangle[3], float32 &colour);			// <-- Makes colour black or white
-
 	void calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal);
 	void getOutgoingReflection(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay);
 	void saveImage();
-	Vector3f GetGausianColor(int x, int y);
-
 
 
 	~MyMeshExperiment();

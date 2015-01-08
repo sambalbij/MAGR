@@ -232,33 +232,35 @@ void MyMeshExperiment::shootRays()
 
 						minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing						
 
-						Vector3f colour[3];
+						//Vector3f colour[3];
 
-						Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);				// <-- location of where ray hit triangle 
+						Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);	// <-- location of where ray hit triangle 
+						hits[x][y][r] = hit;
 						if (mod(hit[0] / 5, 2) == mod(hit[1] / 5, 2))
 						{
 							bestColour = makeVector3f(1, 0, 0);
 						}
 						else
 						{
-							colour[0] = pts->get<float32, 3>(tind[0], COL);
-							colour[1] = pts->get<float32, 3>(tind[1], COL);
-							colour[2] = pts->get<float32, 3>(tind[2], COL);
+							//colour[0] = pts->get<float32, 3>(tind[0], COL);
+							//colour[1] = pts->get<float32, 3>(tind[1], COL);
+							//colour[2] = pts->get<float32, 3>(tind[2], COL);
 
-							if (!shadow)
-								bestColour = (colour[0] + colour[1] + colour[2]) / 3;
-							else
-								bestColour = (colour[0] + colour[1] + colour[2]) / 9;
+							//if (!shadow)
+							bestColour = makeVector3f(1, 1, 1);// (colour[0] + colour[1] + colour[2]) / 3;
+							//else
+							//	bestColour = (colour[0] + colour[1] + colour[2]) / 9;
 						}
 						}
 				}
 				if (minDistanceId == -1) // <-- no collision so no colour
 				{
+					hits[x][y][r] = makeVector3f(0, 0, -3000);
 					bestColour[0] = 0;
 					bestColour[1] = 0;
 					bestColour[2] = 0;
 				}
-				else // do reflection
+				/*else // do reflection
 				{
 					if (x == 100 && y == 100)
 						int sad = 0;
@@ -305,21 +307,52 @@ void MyMeshExperiment::shootRays()
 						bestColour2[2] = 0;
 					}
 					//colours[x][y] = bestColour2;
-				}
+				}*/
 				if (!thereWasARefelction)
-					colorOfRays[r] = bestColour;
+					binnedCoulours[x][y][r] = bestColour;
+					//colorOfRays[r] = bestColour;
 					//colours[x][y] = bestColour;
 				else
-					colorOfRays[r] = bestColour*0.5 + bestColour2 * 0.5;
+					binnedCoulours[x][y][r] = bestColour;
+					//colorOfRays[r] = bestColour*0.5 + bestColour2 * 0.5;
 					//colours[x][y] = bestColour*0.5 + bestColour2 * 0.5;
 			}
 			 //colours[x][y] = colorOfRays[3]; // Center ray color.
-			colours[x][y] = (colorOfRays[0] + colorOfRays[1] + colorOfRays[2]) / 3;	// Average of random rays colors.
+			 //colours[x][y] = (colorOfRays[0] + colorOfRays[1] + colorOfRays[2]) / 3;	// Average of random rays colors.
 		}//rays
 	}
+	// now we have all samples we can do gausians
+	for (int x = 0; x <= size; x++)
+		for (int y = 0; y <= size; y++)
+			colours[x][y] = GetGausianColor(x, y);
 	delete tri;
 }
 
+Vector3f MyMeshExperiment::GetGausianColor(int x, int y)
+{
+	float sigma = 0.5;
+	float totalWeight =0;
+	Vector3f colour = makeVector3f(0,0,0);
+	float weight = 0;
+	for (int dx = -1; dx < 2; dx++)
+		for (int dy = -1; dy < 2; dy++) // loop over 9 pixels
+			for (int i = 0; i <= numberOfRandomRays; i++){ // and over all sampels withing the pixels
+				int finalX = x + dx;
+				int finalY = y + dy;
+				if (finalX > size || finalY>size || finalY < 0 || finalX < 0) // out of bounds prevention
+					continue;
+				if (hits[x][y][i] == makeVector3f(0, 0, -3000))//ray did not hit
+					continue;
+				float distancex = hits[x][y][i][0] - hits[x][y][numberOfRandomRays][0];
+				float distancey = hits[x][y][i][1] - hits[x][y][numberOfRandomRays][1];
+				float distanceToSample = distancex*distancex + distancey*distancey;
+				weight = exp((-1.0f / (2.0f * sigma*sigma))*distanceToSample);
+				totalWeight += weight;
+				colour+=binnedCoulours[x][y][i]* weight;
+			}
+	return colour / totalWeight;
+
+}
 int MyMeshExperiment::mod(float f, int i)
 {
  if (f >= 0)
