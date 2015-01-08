@@ -7,6 +7,7 @@
 #include "BasicGLViewer3D.h"
 #include "BasicGLViewer3D.h"
 //---------------------------------------------------------------------------
+#include "Camera.h"
 
 
 class TriangleMesh;
@@ -18,20 +19,32 @@ class SimpleGLMeshMaterial;
 class MyMeshExperiment: public Experiment, public RenderableObject {
 	GEOX_CLASS(MyMeshExperiment)
 private:
-	const static int rayContainerSize = 101;
-	const static int imageSize = 100;
+	const static int rayContainerSize = 1001;
+	const static int imageSize = 1000;
 	const static int numberOfRandomRays = 3;			// <-- there will be an  extra added for the centre of the pixel
+	const static int gridSize = 3;						// <-- SHOULD ONLY BE UNEVEN
+	const static int gridSpacer = (gridSize - 1) / 2;
+	const static int gridSizeSquared = gridSize * gridSize;
+
+	bool randomIsOn = false;
 
 	BasicGLViewer3D* viewer;
 	TriangleMesh *mesh;
 	SimpleGLMeshMaterial *renderer;
 	ExaminerCameraController* controller;
-	tuple<Vector3f, Vector3f> rays[rayContainerSize][rayContainerSize][numberOfRandomRays+1]; //[Heighth][Width][numRays]. 1-3 reserved for random, 4 for center ray.
+	Camera *camera;
+	
+	tuple<Vector3f, Vector3f> rays[rayContainerSize][rayContainerSize][numberOfRandomRays+1]; //[Heighth][Width][numRays]. 1-#rand reserved for random, last for center ray.
+	tuple<Vector3f, Vector3f> raysGridded[rayContainerSize][rayContainerSize][gridSizeSquared+1]; //[Heighth][Width][numRays]. 1-gridSq reserved for random, last for center ray.
+	
 	Vector3f colours[rayContainerSize][rayContainerSize];
-	Vector3f colorOfRays[numberOfRandomRays+1];
+	Vector3f colourOfRays[numberOfRandomRays+1];
+	Vector3f gridRays[gridSizeSquared+1];
 	Vector3f hits[rayContainerSize][rayContainerSize][numberOfRandomRays + 1];
 	Vector3f binnedCoulours[rayContainerSize][rayContainerSize][numberOfRandomRays + 1];
+	
 	int 	size = imageSize;
+
 public:
 
 	MyMeshExperiment();
@@ -40,29 +53,24 @@ public:
 	void importMesh();
 	virtual QWidget *createViewer();
 
+	void setCurrentCameraPosition();
+	void getCurrentCameraInfo();
+
 	void getViewerInfo();
 	void getRays();
 	void shootRays();
 	bool checkShadow(tuple<Vector3f, Vector3f>, float);
-	int mod(float, int);
-
-	//int32 gridSize;
-	//Vector3f incomingRay;                           // <---
-	//Vector3f vertex1;
-	//Vector3f vertex2;
-	//Vector3f vertex3;
-	//Matrix3f triangleRefl;                           // <--- declare the parameters you need (will be registered in *.cpp file)
 
 	void calculateDot();
 	void calculateMatrixNormal();
-
-	void makeMeshChecker(Vector3f incromingRay, Vector3f triangle[3], float32 &colour);			// <-- Makes colour black or white
+	int mod(float, int);
 
 	void calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal);
 	void getOutgoingReflection(Vector3f incomingRay, Vector3f triangle[3], Vector3f &outgoingRay);
 	void saveImage();
-	Vector3f GetGausianColor(int x, int y);
-
+	
+	Vector3f getGausianColour(int x, int y);
+	Vector3f getAverageSubPixels(Vector3f rays[], int arraySize);
 
 
 	~MyMeshExperiment();

@@ -61,12 +61,12 @@ void init() {
 	WalkthroughCameraController::init(CameraController::getClass());
 
 	Experiment::init(Persistent::getClass());
+	MyMeshExperiment::init(Experiment::getClass());
 	ExampleExperiment::init(Experiment::getClass());
 	ExampleExperiment2DGraphics::init(Experiment::getClass());
 	ExampleExperiment3DGraphics::init(Experiment::getClass());
 	ExampleExperimentMarchingCubes::init(Experiment::getClass());
 	MeshImporterExperiment::init(Experiment::getClass());
-	MyMeshExperiment::init(Experiment::getClass());
 	SimpleGLMeshMaterial::init(Persistent::getClass());
 
    StructureDescriptor::init(Persistent::getClass());

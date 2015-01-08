@@ -12,7 +12,6 @@
 #include "ObjectViewsTable.h"
 //---------------------------------------------------------------------------
 #include "GeoXOutput.h"                         // <--- this include lets you output text in the main window
-#include "Camera.h"
 #include "TriangleRayIntersection.h"
 
 IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
@@ -20,22 +19,16 @@ IMPLEMENT_GEOX_CLASS(MyMeshExperiment, 0)
 	BEGIN_CLASS_INIT(MyMeshExperiment);
 	ADD_OBJECT_PROP(mesh, 0, TriangleMesh::getClass(), true)
 		ADD_OBJECT_PROP(renderer, 0, SimpleGLMeshMaterial::getClass(), true)
+		ADD_NOARGS_METHOD(MyMeshExperiment::getCurrentCameraInfo)
+		ADD_NOARGS_METHOD(MyMeshExperiment::setCurrentCameraPosition)
 		ADD_NOARGS_METHOD(MyMeshExperiment::importMesh)
-		//ADD_NOARGS_METHOD(MyMeshExperiment::calculateDot)
-		//ADD_NOARGS_METHOD(MyMeshExperiment::calculateMatrixNormal)
 		ADD_NOARGS_METHOD(MyMeshExperiment::getViewerInfo)             // <--- get viewer info
-
-	//ADD_SEPARATOR("Vectors & Matrices")          // 
-		//ADD_INT32_PROP(gridSize, 0)
-		//ADD_VECTOR3F_PROP(incomingRay, 0)                // <---
-		//ADD_VECTOR3F_PROP(vertex1, 0)                // <---
-		//ADD_VECTOR3F_PROP(vertex2, 0)                // <---
-		//ADD_VECTOR3F_PROP(vertex3, 0)                // <---
 }
 
 QWidget *MyMeshExperiment::createViewer() {
 	viewer = new BasicGLViewer3D();
 	viewer->addRenderCallback(this);
+	controller = viewer->getController();
 	return viewer;
 }
 
@@ -44,19 +37,12 @@ MyMeshExperiment::MyMeshExperiment()
 	viewer = NULL;
 	mesh = NULL;
 	renderer = new SimpleGLMeshMaterial();
-
-	//gridSize = -1;
-	//incomingRay = makeVector3f(0, 1, -1);
-	//vertex1 = makeVector3f(0, 0, 0);
-	//vertex2 = makeVector3f(0, 1, 0);
-	//vertex3 = makeVector3f(1, 0, 0);
 }
 
 MyMeshExperiment::~MyMeshExperiment()
 {
 	delete renderer;
 }
-
 
 
 void MyMeshExperiment::importMesh()
@@ -86,24 +72,10 @@ void MyMeshExperiment::renderGL()
 void MyMeshExperiment::getViewerInfo() {
 	controller = viewer->getController();
 
-	output	<< "position: " << controller->getCamera()->getPosition()
-		<< " lookat: " << controller->getCamera()->getLookAt()
-		<< " distance: " << controller->getDistance()
-		<< "\n";     
-	
-	//Vector3f tris[3] = {vertex1, vertex2, vertex3};
-
-	//
-	//output << "\n (x, y, z)" << "\n";
-	//output << "vertex1: " << tris[0] << "\n"
-	//	<< "vertex2: " << tris[1] << "\n"
-	//	<< "vertex3: " << tris[2] << "\n";
-
-	//Vector3f outgoing;
-	//getOutgoingReflection(incomingRay, tris, outgoing);
-
-	//output << "incoming: " << incomingRay << "\n";
-	//output << "outgoing: " << outgoing << "\n";
+	output << "position: " << controller->getCamera()->getPosition() << " :: "
+		<< "lookat: " << controller->getCamera()->getLookAt() << " :: "
+		<< "distance: " << controller->getDistance()
+		<< "\n";    
 
 	getRays();
 	shootRays();
@@ -115,7 +87,6 @@ void MyMeshExperiment::getRays()
 {	
 
 	int halfsize = size / 2;
-	controller = viewer->getController();
 	Vector3f lookat, position, right, up, view; 
 	lookat = controller->getCamera()->getLookAt();
 	position = controller->getCamera()->getPosition();
@@ -137,33 +108,79 @@ void MyMeshExperiment::getRays()
 		}*/
 
 	// Random Ray.
+	//Vector3f dr, du, pixelpos, newPixelpos, pixeldr, pixeldu, randomdr, randomdu;
+	//float rndR, rndU;
+
+	//for (int dx = -halfsize; dx <= halfsize; dx++)
+	//	for (int dy = -halfsize; dy <= halfsize; dy++)
+	//	{
+	//		dr = right * distance * dx / halfsize;
+	//		du = up * distance * dy / halfsize;
+	//		pixelpos = lookat - dr - du;
+	//		newPixelpos;
+	//		pixeldr = right * distance / halfsize;
+	//		pixeldu = up * distance / halfsize;
+
+	//		// Random rays.
+	//		for (int i = 0; i < numberOfRandomRays; ++i)
+	//			{
+	//				rndR = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
+	//				rndU = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
+	//				randomdr = pixeldr.operator*(rndR);
+	//				randomdu = pixeldu.operator*(rndU);
+	//				newPixelpos = pixelpos+randomdr+randomdu;
+	//				rays[dx + halfsize][dy + halfsize][i] = tuple<Vector3f, Vector3f>(position, newPixelpos - position);
+	//			}
+
+	//		// Center Ray
+	//		rays[dx + halfsize][dy + halfsize][3] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
+	//	}
+
+	// Divide ray into kxk grid
+	//gridSize;
+
 	Vector3f dr, du, pixelpos, newPixelpos, pixeldr, pixeldu, randomdr, randomdu;
 	float rndR, rndU;
+	int currentRayInGrid;
 
 	for (int dx = -halfsize; dx <= halfsize; dx++)
 		for (int dy = -halfsize; dy <= halfsize; dy++)
 		{
+
 			dr = right * distance * dx / halfsize;
 			du = up * distance * dy / halfsize;
 			pixelpos = lookat - dr - du;
 			newPixelpos;
 			pixeldr = right * distance / halfsize;
 			pixeldu = up * distance / halfsize;
+			currentRayInGrid = 0;
 
-			// Random rays.
-			for (int i = 0; i < numberOfRandomRays; ++i)
+			for (int ddx = -gridSpacer; ddx < gridSize-1; ddx++)
+				for (int ddy = -gridSpacer; ddy < gridSize - 1; ddy++, currentRayInGrid++)
 				{
-					rndR = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
-					rndU = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
-					randomdr = pixeldr.operator*(rndR);
-					randomdu = pixeldu.operator*(rndU);
-					newPixelpos = pixelpos+randomdr+randomdu;
-					rays[dx + halfsize][dy + halfsize][i] = tuple<Vector3f, Vector3f>(position, newPixelpos - position);
+					// pixelpos + ddx*pixeldr/gridSize + ddy*pixeldu/gridSize geeft de center van een subpixel ddx, ddy
+					newPixelpos = pixeldr * ddx / gridSize + pixeldu * ddy / gridSize;
+					// randomdr en randomdu nog delen door gridSize om een random te krijgen binnen je subpixel
+
+					// Random rays.
+
+					
+					if (randomIsOn)
+					{
+						rndR = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
+						rndU = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
+						randomdr = pixeldr.operator*(rndR) / gridSize;
+						randomdu = pixeldu.operator*(rndU) / gridSize;
+						newPixelpos = pixelpos + randomdr + randomdu;
+					}
+					
+					raysGridded[dx + halfsize][dy + halfsize][currentRayInGrid] = tuple<Vector3f, Vector3f>(position, newPixelpos - position);
+
 				}
 
-			// Center Ray
-			rays[dx + halfsize][dy + halfsize][3] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
+			raysGridded[dx + halfsize][dy + halfsize][gridSizeSquared] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
 		}
+		
 }
 
 void MyMeshExperiment::shootRays()
@@ -176,23 +193,18 @@ void MyMeshExperiment::shootRays()
 	AAT POS = pts->getAAT("position");
 
 	AAT COL;
-	bool hasCol = pts->providesAttribute("color");
-	if (hasCol) COL = pts->getAAT("color");
+	bool hasCol = pts->providesAttribute("colour");
+	if (hasCol) COL = pts->getAAT("colour");
 
 	DynamicArrayOfStructures *idx = mesh->getTriangles();
 	if (!idx->providesAttribute("index")) return;
 	AAT IDX = idx->getAAT("index");
 
-	/*AAT NRM;
-	bool hasNormal = pts->providesAttribute("normal");
-	if (hasNormal) NRM = pts->getAAT("normal");
-	*/
 	bool reflectionDepth = true;
 
-	//vector < MyTriangle > triangles;
 
 
-	int allSubRays = numberOfRandomRays + 1;
+	int allSubRays = gridSizeSquared + 1;
 	// loop over rays
 	for (int x = 0; x <= size; x++)
 	{
@@ -200,7 +212,7 @@ void MyMeshExperiment::shootRays()
 		{
 			for (int r = 0; r < allSubRays; ++r)
 			{
-				tuple<Vector3f, Vector3f> ray = rays[x][y][r];
+				tuple<Vector3f, Vector3f> ray = raysGridded[x][y][r];
 				float distance;											// <-- scalar multiplied with ray direction is distance
 				float minDistance = 99999;								// <-- used to find nearest triangle
 				int minDistanceId = -1;									// <-- check for background
@@ -307,26 +319,42 @@ void MyMeshExperiment::shootRays()
 					//colours[x][y] = bestColour2;
 				}
 				if (!thereWasARefelction)
-					binnedCoulours[x][y][r] = bestColour;// <-- used for gausians
-					//colorOfRays[r] = bestColour; // <-- used for random rays
-					//colours[x][y] = bestColour; // <-- used for no AA
+					//binnedCoulours[x][y][r] = bestColour;						// <-- used for gausians
+					//colourOfRays[r] = bestColour;								// <-- used for random rays
+					//colours[x][y] = bestColour;								// <-- used for no AA
+					gridRays[r] = bestColour;									// <-- used for jitter
 				else
-					binnedCoulours[x][y][r] = bestColour; // <-- used for gausians
-					//colorOfRays[r] = bestColour*0.5 + bestColour2 * 0.5; // <-- used fo random rays
-					//colours[x][y] = bestColour*0.5 + bestColour2 * 0.5; //<-- used for no AA
+					//binnedCoulours[x][y][r] = bestColour;						// <-- used for gausians
+					//colourOfRays[r] = bestColour*0.5 + bestColour2 * 0.5;		// <-- used fo random rays
+					//colours[x][y] = bestColour*0.5 + bestColour2 * 0.5;		// <-- used for no AA
+					gridRays[r] = bestColour*0.5 + bestColour2 * 0.5;			// <-- used for jitter
 			}
-			 //colours[x][y] = colorOfRays[3]; // Center ray color. 
-			 colours[x][y] = (colorOfRays[0] + colorOfRays[1] + colorOfRays[2]) / 3;	// Average of random rays colors.
+			 	//colours[x][y] = colourOfRays[allSubRays]; // Center ray colour. 
+			 // colours[x][y] = (colourOfRays[0] + colourOfRays[1] + colourOfRays[2]) / numberOfRandomRays;		// Average of random rays colours.
+			
+			colours[x][y] = getAverageSubPixels(gridRays, gridSizeSquared);						// <-- used for jitter
+
+
 		}//rays
 	}
 	// now we have all samples we can do gausians 
-	for (int x = 0; x <= size; x++) // (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
-		for (int y = 0; y <= size; y++) // (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
-			colours[x][y] = GetGausianColor(x, y); // (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
+	//for (int x = 0; x <= size; x++)						// (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
+	//	for (int y = 0; y <= size; y++)					// (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
+	//		colours[x][y] = getGausianColour(x, y);		// (COMMENT AWAY WHEN NOT USING GAUSIANS!!!)
 	delete tri;
 }
 
-Vector3f MyMeshExperiment::GetGausianColor(int x, int y)
+Vector3f MyMeshExperiment::getAverageSubPixels(Vector3f rays[], int sizeOfRays )
+{
+	Vector3f colour = makeVector3f(0, 0, 0);
+	for (int i = 0; i < sizeOfRays; i++)
+	{
+		colour += gridRays[i];
+	}
+	return colour / sizeOfRays;
+}
+
+Vector3f MyMeshExperiment::getGausianColour(int x, int y)
 {
 	float sigma = 4;
 	float totalWeight =0;
@@ -351,12 +379,32 @@ Vector3f MyMeshExperiment::GetGausianColor(int x, int y)
 	return colour / totalWeight;
 
 }
+
 int MyMeshExperiment::mod(float f, int i)
 {
  if (f >= 0)
   return (int)f%i;
  else
   return 1 - (((int)f%i + i) % i);
+}
+
+void MyMeshExperiment::setCurrentCameraPosition()
+{
+	camera = controller->getCamera();
+	camera->setPosition(makeVector3f(159.828, -86.4358, 38.7048));
+	camera->setUp(makeVector3f(0, 0, 1));
+	camera->setLookAt(makeVector3f(-0.512191, -15.8515, -23.1263));
+	controller->setToCamera(camera, camera->getLookAt());
+	viewer->refresh();
+	getCurrentCameraInfo();
+
+}
+
+void MyMeshExperiment::getCurrentCameraInfo()
+{
+	camera = controller->getCamera();
+	output << "position: " << camera->getPosition() << "\n";
+	output << "lookat:  " << camera->getLookAt() << "\n";
 }
 
 //void MyMeshExperiment::shootRays()
@@ -369,8 +417,8 @@ int MyMeshExperiment::mod(float f, int i)
 //	AAT POS = pts->getAAT("position");
 //
 //	AAT COL;
-//	bool hasCol = pts->providesAttribute("color");
-//	if (hasCol) COL = pts->getAAT("color");
+//	bool hasCol = pts->providesAttribute("colour");
+//	if (hasCol) COL = pts->getAAT("colour");
 //
 //	DynamicArrayOfStructures *idx = mesh->getTriangles();
 //	if (!idx->providesAttribute("index")) return;
@@ -509,10 +557,6 @@ int MyMeshExperiment::mod(float f, int i)
 //	output << "SurfaceNormal: " << normal << "\n";
 //}
 
-void MyMeshExperiment::makeMeshChecker(Vector3f incomingRay, Vector3f triangle[3], float32 &colour)
-{
-	
-}
 
 void MyMeshExperiment::calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal)
 {
@@ -529,15 +573,6 @@ void MyMeshExperiment::getOutgoingReflection(Vector3f incomingRay, Vector3f tria
 	Vector3f d = ri.componentProduct(normal);
 	float dotProd = d[0] + d[1] + d[2];
 	outgoingRay = ri - (normal.operator*(2)).operator*(dotProd);
-
-	/*Vector3f ri = incomingRay.operator*(-1);
-	Vector3f d = ri.componentProduct(normal);
-	float dotProd = d[0] + d[1] + d[2];
-	outgoingRay = (ri.operator*(2).operator*(dotProd).operator-(ri));*/
-
-	/*Vector3f incomingRayNormalized = incomingRay / norm(incomingRay);
-
-	outgoingRay = normal * ((normal * incomingRayNormalized) * 2) - incomingRayNormalized;*/
 	
 }
 
