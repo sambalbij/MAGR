@@ -19,10 +19,10 @@ class SimpleGLMeshMaterial;
 class MyMeshExperiment: public Experiment, public RenderableObject {
 	GEOX_CLASS(MyMeshExperiment)
 private:
-	const static int rayContainerSize = 201;
-	const static int imageSize = 200;
-	const static int numberOfRandomRays = 3;			// <-- there will be an  extra added for the centre of the pixel
-	const static int gridSize = 3;						// <-- SHOULD ONLY BE UNEVEN
+	const static int rayContainerSize = 401;
+	const static int imageSize = 400;
+	const static int numberOfRandomRays = 6;			// <-- there will be an  extra added for the centre of the pixel
+	const static int gridSize = 5;						// <-- SHOULD ONLY BE UNEVEN
 	const static int gridSpacer = (gridSize - 1) / 2;
 	const static int gridSizeSquared = gridSize * gridSize;
 

@@ -97,17 +97,7 @@ void MyMeshExperiment::getRays()
 	right.normalize();
 	float distance = controller->getDistance();
 
-	// Center Ray.
-	/*for (int dx = -halfsize; dx <= halfsize; dx++)
-		for (int dy = -halfsize; dy <= halfsize; dy++)
-		{
-			Vector3f dr = right * distance * dx / halfsize;
-			Vector3f du = up * distance * dy / halfsize;
-			Vector3f pixelpos = lookat - dr - du;
-			rays[dx + halfsize][dy + halfsize][0] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
-		}*/
-
-	// Random Ray.
+	// Rays.
 	//Vector3f dr, du, pixelpos, newPixelpos, pixeldr, pixeldu, randomdr, randomdu;
 	//float rndR, rndU;
 
@@ -136,9 +126,7 @@ void MyMeshExperiment::getRays()
 	//		rays[dx + halfsize][dy + halfsize][3] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
 	//	}
 
-	// Divide ray into kxk grid
-	//gridSize;
-
+	// Jitter, divide ray into kxk grid
 	Vector3f dr, du, pixelpos, newPixelpos, pixeldr, pixeldu, randomdr, randomdu;
 	float rndR, rndU;
 	int currentRayInGrid;
@@ -151,38 +139,26 @@ void MyMeshExperiment::getRays()
 			du = up * distance * dy / halfsize;
 			pixelpos = lookat - dr - du;
 			newPixelpos;
-			pixeldr = right * distance / halfsize;
+			pixeldr = right * distance / halfsize;	// <-- right vector from one center of pixel to the center of the next pixel 
 			pixeldu = up * distance / halfsize;
 			currentRayInGrid = 0;
 
-			for (int ddx = -gridSpacer; ddx < gridSize-1; ddx++)
-				for (int ddy = -gridSpacer; ddy < gridSize - 1; ddy++, currentRayInGrid++)
+			for (int ddx = -gridSpacer; ddx <= gridSpacer; ddx++)
+				for (int ddy = -gridSpacer; ddy <= gridSpacer; ddy++, currentRayInGrid++)
 				{
-					// pixelpos + ddx*pixeldr/gridSize + ddy*pixeldu/gridSize geeft de center van een subpixel ddx, ddy
-					newPixelpos = pixeldr * ddx / gridSize + pixeldu * ddy / gridSize;
-					// randomdr en randomdu nog delen door gridSize om een random te krijgen binnen je subpixel
+					newPixelpos = pixeldr * ddx / gridSize + pixeldu * ddy / gridSize + pixelpos;	// <-- get the center of a subpixel					
 
-					// Random rays.
-
-					
+					// Random rays.					
 					if (randomIsOn)
 					{
 						rndR = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
 						rndU = -0.5 + static_cast <float> (rand()) / static_cast <float> (RAND_MAX / 0.5);
-						randomdr = pixeldr.operator*(rndR) / gridSize;
-						randomdu = pixeldu.operator*(rndU) / gridSize;
-						newPixelpos = pixelpos + randomdr + randomdu;
+						randomdr = pixeldr / gridSize * rndR; 
+						randomdu = pixeldr / gridSize * rndU;
+						newPixelpos = newPixelpos + randomdr + randomdu;	// <-- add new random vector to the center of subpixel
 					}
-					else
-					{
-						newPixelpos = pixelpos + pixeldr / gridSize + pixeldu / gridSize;
-					}
-
 					raysGridded[dx + halfsize][dy + halfsize][currentRayInGrid] = tuple<Vector3f, Vector3f>(position, newPixelpos - position);
-
 				}
-
-			raysGridded[dx + halfsize][dy + halfsize][gridSizeSquared] = tuple<Vector3f, Vector3f>(position, pixelpos - position);
 		}
 		
 }
@@ -205,10 +181,8 @@ void MyMeshExperiment::shootRays()
 	AAT IDX = idx->getAAT("index");
 
 	bool reflectionDepth = true;
-
-
-
 	int allSubRays = gridSizeSquared + 1;
+
 	// loop over rays
 	for (int x = 0; x <= size; x++)
 	{
@@ -235,38 +209,23 @@ void MyMeshExperiment::shootRays()
 					pos[1] = pts->get<float32, 3>(tind[1], POS);
 					pos[2] = pts->get<float32, 3>(tind[2], POS);
 
-
 					// get intersection + distance
 					bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);		// <-- distance is a result
 					if (xt)
 						if (distance < minDistance)						// <-- check if closest
 						{
-						getOutgoingReflection(std::get<1>(ray), pos, outgoingRay); // get outgoing ray for reflection
-
-						minDistance = distance;							// <-- set current triangle as closest
-						bool shadow = checkShadow(ray, distance);		// <-- check if there are triangles blocking the light
-
-						minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing						
-
-						//Vector3f colour[3];
-
-						Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);	// <-- location of where ray hit triangle 
-						hits[x][y][r] = hit;							// <-- used when using gausian AA
-						if (mod(hit[0] / 5, 2) == mod(hit[1] / 5, 2))
-						{
-							bestColour = makeVector3f(1, 0, 0);
-						}
-						else
-						{
-							//colour[0] = pts->get<float32, 3>(tind[0], COL);
-							//colour[1] = pts->get<float32, 3>(tind[1], COL);
-							//colour[2] = pts->get<float32, 3>(tind[2], COL);
-
-							//if (!shadow)
-							bestColour = makeVector3f(1, 1, 1);// (colour[0] + colour[1] + colour[2]) / 3;
-							//else
-							//	bestColour = (colour[0] + colour[1] + colour[2]) / 9;
-						}
+							getOutgoingReflection(std::get<1>(ray), pos, outgoingRay); // get outgoing ray for reflection
+							minDistance = distance;							// <-- set current triangle as closest
+							bool shadow = checkShadow(ray, distance);		// <-- check if there are triangles blocking the light
+							minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing						
+							
+							// Draw the checkerboard
+							Vector3f hit = (std::get<0>(ray) +std::get<1>(ray)*distance);	// <-- location of where ray hit triangle 
+							hits[x][y][r] = hit;							// <-- used when using gausian AA
+							if (mod(hit[0] / 2, 2) == mod(hit[1] / 2, 2))
+								bestColour = makeVector3f(1, 0, 0);							
+							else
+								bestColour = makeVector3f(1, 1, 1);							
 						}
 				}
 				if (minDistanceId == -1) // <-- no collision so no colour
@@ -333,10 +292,10 @@ void MyMeshExperiment::shootRays()
 					//colours[x][y] = bestColour*0.5 + bestColour2 * 0.5;		// <-- used for no AA
 					gridRays[r] = bestColour*0.5 + bestColour2 * 0.5;			// <-- used for jitter
 			}
-			 	//colours[x][y] = colourOfRays[allSubRays]; // Center ray colour. 
-			 // colours[x][y] = (colourOfRays[0] + colourOfRays[1] + colourOfRays[2]) / numberOfRandomRays;		// Average of random rays colours.
-			
+
+			//colours[x][y] = colourOfRays[allSubRays];											// <-- used for center ray (color of the ray) 
 			colours[x][y] = getAverageSubPixels(gridRays, gridSizeSquared);						// <-- used for jitter
+			//colours[x][y] = getAverageSubPixels(colourOfRays, numberOfRandomRays);			// <-- used for random rays
 
 
 		}//rays
@@ -411,156 +370,6 @@ void MyMeshExperiment::getCurrentCameraInfo()
 	output << "lookat:  " << camera->getLookAt() << "\n";
 }
 
-//void MyMeshExperiment::shootRays()
-//{
-//	TriangleRayIntersection* tri = new TriangleRayIntersection();
-//
-//	if (mesh == NULL) return;
-//	DynamicArrayOfStructures *pts = mesh->getVertices();
-//	if (!pts->providesAttribute("position")) return;
-//	AAT POS = pts->getAAT("position");
-//
-//	AAT COL;
-//	bool hasCol = pts->providesAttribute("colour");
-//	if (hasCol) COL = pts->getAAT("colour");
-//
-//	DynamicArrayOfStructures *idx = mesh->getTriangles();
-//	if (!idx->providesAttribute("index")) return;
-//	AAT IDX = idx->getAAT("index");
-//
-//	/*AAT NRM;
-//	bool hasNormal = pts->providesAttribute("normal");
-//	if (hasNormal) NRM = pts->getAAT("normal");
-//*/
-//	bool reflectionDepth = true;
-//
-//	//vector < MyTriangle > triangles;
-//
-//	// loop over rays
-//	for (int x = 0; x <= size; x++)
-//	{
-//		for (int y = 0; y <= size; y++)
-//		{
-//			tuple<Vector3f, Vector3f> ray = rays[x][y];
-//			float distance;											// <-- scalar multiplied with ray direction is distance
-//			float minDistance = 99999;								// <-- used to find nearest triangle
-//			int minDistanceId = -1;									// <-- check for background
-//			Vector3f bestColour;
-//
-//			bool thereIsAReflection = false;
-//			// loop over triangle
-//			const card32 numTri = idx->getNumEntries();
-//			for (card32 i = 0; i < numTri; i++) {
-//				Vector3i tind = idx->get<int32, 3>(i, IDX);			// <-- triangle index of vertices (comes from triangle dynamic thing)
-//				Vector3f pos[3];									// <-- position of all vertices of the triangle
-//				pos[0] = pts->get<float32, 3>(tind[0], POS);
-//				pos[1] = pts->get<float32, 3>(tind[1], POS);
-//				pos[2] = pts->get<float32, 3>(tind[2], POS);
-//
-//
-//				// get intersection + distance
-//				bool xt = tri->getIntersection(std::get<0>(ray), std::get<1>(ray), pos, distance);		// <-- distance is a result
-//				if (xt)
-//					if (distance < minDistance)						// <-- check if closest
-//				{
-//					minDistance = distance;							// <-- set current triangle as closest
-//					bool shadow = checkShadow(ray, distance);		// <-- check if there are triangles blocking the light
-//					
-//					minDistanceId = i;								// <-- a check to see if current current triangle is closer than existing
-//					Vector3f colour[3];
-//					colour[0] = pts->get<float32, 3>(tind[0], COL);
-//					colour[1] = pts->get<float32, 3>(tind[1], COL);
-//					colour[2] = pts->get<float32, 3>(tind[2], COL);
-//
-//
-//					// REFLECTION CALCULATION
-//					if (reflectionDepth)
-//					{
-//						float distance2;											// <-- scalar multiplied with ray direction is distance
-//						float minDistance2 = 99999;								// <-- used to find nearest triangle
-//						int minDistanceId2 = -1;									// <-- check for background
-//						Vector3f bestColour2;
-//
-//
-//						Vector3f outgoingRay;
-//						getOutgoingReflection(std::get<1>(ray), pos, outgoingRay);
-//
-//						for (card32 j = 0; j < numTri; j++) {
-//							Vector3i tind2 = idx->get<int32, 3>(j, IDX);			// <-- triangle index of vertices (comes from triangle dynamic thing)
-//							Vector3f pos2[3];									// <-- position of all vertices of the triangle
-//							pos2[0] = pts->get<float32, 3>(tind2[0], POS);
-//							pos2[1] = pts->get<float32, 3>(tind2[1], POS);
-//							pos2[2] = pts->get<float32, 3>(tind2[2], POS);
-//
-//
-//							// get intersection + distance
-//							thereIsAReflection = tri->getIntersection(std::get<1>(ray)*distance, outgoingRay, pos2, distance2);		// <-- distance is a result
-//							if (thereIsAReflection)
-//								if (distance2 < minDistance2)						// <-- check if closest
-//								{
-//									minDistance2 = distance2;							// <-- set current triangle as closest
-//									//bool shadow2 = checkShadow(tuple<Vector3f, Vector3f>(std::get<1>(ray)*distance, outgoingRay), distance2);		// <-- check if there are triangles blocking the light
-//
-//									minDistanceId2 = j;								// <-- a check to see if current current triangle is closer than existing
-//									Vector3f colour2[3];
-//									colour2[0] = pts->get<float32, 3>(tind2[0], COL);
-//									colour2[1] = pts->get<float32, 3>(tind2[1], COL);
-//									colour2[2] = pts->get<float32, 3>(tind2[2], COL);
-//
-//									bestColour2 = (colour2[0] + colour2[1] + colour2[2]) / 3;
-//								}
-//						}
-//						if (minDistanceId2 == -1) // <-- no collision so no colour
-//						{
-//							bestColour2[0] = 0;
-//							bestColour2[1] = 0;
-//							bestColour2[2] = 0;
-//						}
-//						colours[x][y] = bestColour2;
-//					}
-//					if (!shadow)
-//						bestColour = ( colour[0] + colour[1] + colour[2] ) / 3;
-//					else
-//					{
-//						bestColour = (colour[0] + colour[1] + colour[2] ) / 0.9;
-//						//bestColour = (colour[0] / 3 + colour[1] / 3 + colour[2] / 3)*0.3;
-//					}
-//				}
-//			}
-//			if (minDistanceId == -1) // <-- no collision so no colour
-//			{
-//				bestColour[0] = 0;
-//				bestColour[1] = 0;
-//				bestColour[2] = 0;
-//			}
-//			if (!reflectionDepth || !thereIsAReflection)
-//				colours[x][y] = bestColour;
-//			else
-//				colours[x][y] = bestColour*0.7 + colours[x][y] * 0.3;
-//		}//rays
-//	}
-//	delete tri;
-//}
-
-//void MyMeshExperiment::calculateDot()
-//{
-//	output << "dot: " << incomingRay * vertex1 << "\n";
-//}
-
-//void MyMeshExperiment::calculateMatrixNormal()
-//{
-//	Vector3f normal;
-//	Vector3f tris[3] = { vertex1, vertex2, vertex3 };
-//
-//	//tris[0] = triangleRefl * makeVector3f(1, 0, 0);
-//	//tris[1] = triangleRefl * makeVector3f(0, 1, 0);
-//	//tris[2] = triangleRefl * makeVector3f(0, 0, 1);
-//
-//	calculateSurfaceNormal(tris, normal);
-//
-//	output << "SurfaceNormal: " << normal << "\n";
-//}
-
 
 void MyMeshExperiment::calculateSurfaceNormal(Vector3f triangle[3], Vector3f &normal)
 {
@@ -625,18 +434,3 @@ void MyMeshExperiment::saveImage()
 	}
 	image.save(QString("test.png"));
 }
-
-/*
-MyTriangle t;
-t.pos[0] = pos[0];
-t.pos[1] = pos[1];
-t.pos[2] = pos[2];\
-
-triangles.push_back(t);
-
-struct MyTriangle
-{
-Vector3f pos[3];
-
-};
-*/
